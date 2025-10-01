@@ -1,48 +1,49 @@
 # Validation problem to address hydrogen concentration, trapping, and diffusion through a 304 stainless steel mini canister
 # Report: https://inldigitallibrary.inl.gov/sites/sti/sti/Sort_129733.pdf
 
-### Geometry ###
+# Geometry
 inner_radius = '${units 1.415 in -> m}' # Radius of canister containing gases
 steel_thickness =  '${units 0.085 in -> m}' # Thickness of steel enclosure
-total_radius = '${units 1.5 in -> m}'
-# interface_width = '${units 1e-06 in -> mm}' # Having node directly on interface is not well defined for InterfaceSorption kernel it seems
+total_radius = '${fparse inner_radius + steel_thickness}'
 
-### Physical & Chemical Constants ###
+# Ambient Physical & Chemical Parameters
 temperature = '${units 313.15 K}' # mild temp
 initial_pressure = '${units 2.4 psi -> Pa}' # Anywhere from 1-10% of 24 psi
 ideal_gas_constant = '${units 8.31446261815324 J/K/mol}'
-right_pressure = '${units 0.0 psi -> Pa}'
 
-# Gas internal to canister
+# Parameters related to Gas in Canister
 diffusivity_H_in_gas = '${units 2.7e-02 m^2/s}' # Table 1 https://www.sciencedirect.com/science/article/pii/S1540748902801675
-# solubility_H_in_gas = '${units 1e5 at/m^3/Pa -> at/mm^3/psi}'
-# solubility_activation_energy_in_gas = '${units 1e3 J/mol}'
-initial_concentration_gas = '${units ${fparse initial_pressure/(ideal_gas_constant*temperature)} mol/m^3}' # P = C_gRT from interface kernel
+
+# Initial Concentrations
+initial_concentration_gas = '${fparse initial_pressure/(ideal_gas_constant*temperature)}' # P = C_gRT from interface kernel
 initial_concentration_steel = '${units 0 mol/m^3}'
 
-# Steel walls of canister
+# Paramters Related to Stainless Steel walls of Canister
 diffusivity_H_in_steel = '${units 2.86e-13 m^2/s}'
-solubility_H_in_steel = '${units ${fparse 2.66e5/2} mol/m^3/Pa}' # Table 2.1 https://www.sandia.gov/app/uploads/sites/158/2021/12/1500TechRef_ferriticSS.pdf
-# solubility_H_in_steel = '${units 266 mol/m^3/MPa^(1/2) -> mol/mm^3/Pa}'
+solubility_H_in_steel = '${units 2.66e5 mol/m^3/Pa}' # Table 2.1 for H2 so need to divide by 2 if tracking atoms: https://www.sandia.gov/app/uploads/sites/158/2021/12/1500TechRef_ferriticSS.pdf
 solubility_activation_energy_in_steel = '${units 6.86e3 J/mol}'
 
 # Interface Kernel Scaling: May need to change as units are changed
 unit_scale = 1
 unit_scale_neighbor = 1
 
-### Additional Parameters
+### Additional Parameters that may be needed
 # atomic_density = 1
 # trapping_density = 1
 # trapping_energy = 1
 # R = '${units 8.31446261815324 J/mol/K}' # Gas constant
 
+# Mesh
+num_intervals_gas = 10
+num_intervals_steel = 1000
+# num_intervals_steel = '${fparse num_intervals_gas * steel_thickness // total_radius}' # Gives roughly same element length in two blocks
+
 # Numerics
 dt_max = ${units 100 s}
 dt_min = ${units 1e-12 s}
-endtime = ${units 3e7 s}
-# endtime = ${units 1e1 s}
+# endtime = ${units 3e7 s}
+endtime = ${units 3e3 s}
 dt_start = ${units 1e-10 s}
-# trap_per_free = 1
 
 [Mesh]
   [radial_cross_section]
@@ -50,7 +51,7 @@ dt_start = ${units 1e-10 s}
     dim = 1
     show_info = true
     dx = '${inner_radius} ${steel_thickness}'
-    ix = '1000 200'
+    ix = '${num_intervals_gas} ${num_intervals_steel}'
     subdomain_id = '0 1'
   []
 
@@ -83,9 +84,11 @@ dt_start = ${units 1e-10 s}
 
 [AuxVariables]
   [H_partial_pressure] # Ambient pressure through whole system
-    initial_condition = '${right_pressure}' # '${initial_pressure}'
+    initial_condition = '${initial_pressure}'
   []
   [dummy_var] # Variable needed for bounds system
+  []
+  [time]
   []
 []
 
@@ -121,12 +124,9 @@ dt_start = ${units 1e-10 s}
   n_sorption = 0.5 # Sievert
   temperature = '${temperature}'
   Ea = '${solubility_activation_energy_in_steel}'
-  neighbor_var = H_mobile_gas # Should the kernel be from the perspective of the steel or the gas? Does it matter?
-  # neighbor_var = H_mobile_steel
+  neighbor_var = H_mobile_gas
   variable = H_mobile_steel
-  # variable = H_mobile_gas
   boundary = interface_steel_to_gas
-  # boundary = interface_gas_to_steel
   diffusivity = '${diffusivity_H_in_steel}'
   unit_scale = '${unit_scale}'
   unit_scale_neighbor = '${unit_scale_neighbor}'
@@ -144,12 +144,6 @@ dt_start = ${units 1e-10 s}
     temperature = '${temperature}'
     p = 0.5 #Sievert's Law
   []
-#   [test]
-#     type = ADDirichletBC
-#     boundary = "1"
-#     value = 1.0
-#     variable = H_mobile_steel
-#   []
 []
 
 [Bounds]
@@ -180,11 +174,37 @@ dt_start = ${units 1e-10 s}
   []
 []
 
+[VectorPostprocessors]
+  [line_plot_gas]
+    type = LineValueSampler
+    start_point = '0 0 0'
+    end_point = '${inner_radius} 0 0'
+    num_points ='${fparse num_intervals_gas + 1}' # n intervals gives n+1 nodes
+    sort_by = x
+    execute_on = 'TIMESTEP_END'
+    variable = 'H_mobile_gas'
+  []
+  [line_plot_steel]
+    type = LineValueSampler
+    start_point = '${inner_radius} 0 0'
+    end_point = '${total_radius} 0 0'
+    num_points ='${fparse num_intervals_steel + 1}' # n intervals gives n+1 nodes plus double node at interface
+    sort_by = x
+    variable = 'H_mobile_steel'
+  []
+[]
+
 [Postprocessors]
-  [Mobile_gas_interface]
+  [Mobile_gas_interface] # Needed to replace malfunctioning vpp
     type = PointValue
     point = '${inner_radius} 0 0'
     variable = H_mobile_gas
+  []
+  [timesteps]
+    type = NumTimeSteps
+  []
+  [time]
+    type = TimePostprocessor
   []
   [Mobile_steel_interface]
     type = PointValue
@@ -225,7 +245,9 @@ dt_start = ${units 1e-10 s}
 
 [Outputs]
   exodus = true
-  csv = true
-  execute_on = 'TIMESTEP_END'
-  # perf_graph = true
+  [csv_data]
+    type = CSV
+    file_base = 'csv_data/'
+    execute_on = 'TIMESTEP_END'
+  []
 []
