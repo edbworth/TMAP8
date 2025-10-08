@@ -27,8 +27,9 @@ def plot_data(t, y_data, y_label, title_suffix):
 
     # Labels and title
     plt.xlabel('Time (s)')
-    plt.ylabel('Concentration (mol/m^3)')
+    plt.ylabel('Concentration (mol/mm^3)')
     plt.title(f'1D Hydrogen Canister Simulation: {title_suffix}')
+    plt.xlim(0,t.max())
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
