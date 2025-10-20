@@ -5,12 +5,12 @@ import os
 
 def subplot_bar_profile(timestep, data_dir='csv_data'):
     # Load the data
-    gas_path = os.path.join(data_dir, f"_line_plot_gas_{timestep:04d}.csv")
-    steel_path = os.path.join(data_dir, f"_line_plot_steel_{timestep:04d}.csv")
+    gas_path = os.path.join(data_dir, f"verification_line_plot_gas_{timestep:04d}.csv")
+    steel_path = os.path.join(data_dir, f"verification_line_plot_steel_{timestep:04d}.csv")
 
     gas_df = pd.read_csv(gas_path, skipinitialspace=True)
     steel_df = pd.read_csv(steel_path, skipinitialspace=True)
-    corrective_df = pd.read_csv(os.path.join(data_dir,".csv"), skipinitialspace = True)
+    corrective_df = pd.read_csv(os.path.join(data_dir,"verification.csv"), skipinitialspace = True)
 
     # Replace Correct Data point for gas concentration at interface due to bug in vpp
     # print(gas_df['H_mobile_gas'].iloc[-1])
@@ -47,7 +47,7 @@ def subplot_bar_profile(timestep, data_dir='csv_data'):
     ax1.set_xlim(gas_x.min(), gas_x.max())
     ax1.set_ylim(gas_values.min()*0.5, gas_values.max()*1.5)
     ax1.set_ylabel('Concentration in Gas (mol/mm^3)')
-    ax1.set_title(f'Timestep {timestep} at Time: {time[timestep-1]} s')
+    ax1.set_title(f'Timestep {timestep} at Time: {time[timestep-1]:01.2f} days')
     ax1.grid(True)
 
     # Steel phase plot

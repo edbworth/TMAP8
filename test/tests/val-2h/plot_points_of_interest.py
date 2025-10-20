@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # Load CSV data
-data = pd.read_csv('csv_data/.csv')
+data = pd.read_csv('csv_data/verification.csv')
 
 # Assume the CSV has columns 'x' and 'value'
 t = data['time']
@@ -11,6 +11,7 @@ Mobile_gas_interface = data['Mobile_gas_interface']
 Mobile_steel_interface = data['Mobile_steel_interface']
 Mobile_gas_center_of_canister = data['Mobile_gas_center']
 Mobile_steel_edge_to_air = data['Mobile_steel_edge_air']
+outflux = data['outflux']
 
 # Define interface location (adjust as needed)
 interface = 0.35941 #meters
@@ -26,7 +27,7 @@ def plot_data(t, y_data, y_label, title_suffix):
     # plt.text(interface, 0 , 'Steel', fontsize=12, color='black')
 
     # Labels and title
-    plt.xlabel('Time (s)')
+    plt.xlabel('Time (Days)')
     plt.ylabel('Concentration (mol/mm^3)')
     plt.title(f'1D Hydrogen Canister Simulation: {title_suffix}')
     plt.xlim(0,t.max())
@@ -45,3 +46,6 @@ plot_data(t, Mobile_steel_interface, 'Mobile_steel_interface', 'Mobile Concentra
 
 # Plot for Mobile_steel_edge_to_air
 plot_data(t, Mobile_steel_edge_to_air, 'Mobile_steel_edge_to_air', 'Steel Edge to Air: EquilibriumBC')
+
+# plot diffusive outflux
+plot_data(t,outflux, 'Diffusive Outflux', 'Concentration Flow out of Steel')

@@ -8,10 +8,10 @@ import glob
 data_dir = 'csv_data'
 
 # Load the corrective data once
-corrective_df = pd.read_csv(os.path.join(data_dir, ".csv"), skipinitialspace=True)
+corrective_df = pd.read_csv(os.path.join(data_dir, "verification.csv"), skipinitialspace=True)
 
 # Get all gas files to determine number of timesteps
-gas_files = sorted(glob.glob(os.path.join(data_dir, "_line_plot_gas_*.csv")))
+gas_files = sorted(glob.glob(os.path.join(data_dir, "verification_line_plot_gas_*.csv")))
 num_timesteps = len(gas_files)
 
 # Set up the figure and axes
@@ -24,8 +24,8 @@ def animate(timestep):
     timestep += 1  # because your files start at 0001
 
     # File paths
-    gas_path = os.path.join(data_dir, f"_line_plot_gas_{timestep:04d}.csv")
-    steel_path = os.path.join(data_dir, f"_line_plot_steel_{timestep:04d}.csv")
+    gas_path = os.path.join(data_dir, f"verification_line_plot_gas_{timestep:04d}.csv")
+    steel_path = os.path.join(data_dir, f"verification_line_plot_steel_{timestep:04d}.csv")
 
     # Load data
     gas_df = pd.read_csv(gas_path, skipinitialspace=True)
@@ -49,7 +49,7 @@ def animate(timestep):
     ax1.set_xlim(gas_x.min(), gas_x.max())
     ax1.set_ylim(gas_values.min() * 0.5, gas_values.max() * 1.5)
     ax1.set_ylabel('Concentration in Gas (mol/mm³)')
-    ax1.set_title(f'Timestep {timestep} at Time: {time[timestep-1]:04f} s')
+    ax1.set_title(f'Timestep {timestep} at Time: {time[timestep-1]:01.2f} days')
     ax1.grid(True)
 
     # Plot steel

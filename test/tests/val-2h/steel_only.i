@@ -180,7 +180,7 @@ dt_start = ${units 60 s}
   petsc_options_value = 'lu'
   # petsc_options_iname = '-pc_type -pc_hypre_type -ksp_type'
   # petsc_options_value = 'hypre boomeramg cg'
-  # petsc_options = '-pc_svd_monitor -snes_test_jacobian '
+  petsc_options = '-pc_svd_monitor -snes_test_jacobian '
   # petsc_options_iname = '-snes_linesearch_damping' # add -snes_type if bounds system active
   # petsc_options_value = '0.5' # add  vinewtonrsls if bounds system active
   line_search = NONE
@@ -192,7 +192,7 @@ dt_start = ${units 60 s}
   [TimeStepper]
     type = IterationAdaptiveDT
     dt = ${dt_start}
-    optimal_iterations = 10
+    optimal_iterations = 5
     growth_factor = 1.1
     cutback_factor_at_failure = .9
   []
