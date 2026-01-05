@@ -43,8 +43,8 @@ num_intervals_steel = 5000
 # Numerics
 dt_max = '${units 7 day -> day}'
 dt_min = '${units 1 h -> day}'
-# endtime = '${units 1 year -> day}'
-endtime = '${units 0.25 year -> day}'
+endtime = '${units 10 year -> day}'
+# endtime = '${units 0.25 year -> day}'
 dt_start = '${units 1 h -> day}' # 3 hours does not give negative concentration for current input parameters
 
 [Mesh]
@@ -68,9 +68,13 @@ dt_start = '${units 1 h -> day}' # 3 hours does not give negative concentration 
 [AuxVariables]
   [H_partial_pressure_gas] # No initial condition as pressure is ramped up
   # initial_condition = '${initial_pressure_gas}'
+    # order = FIRST
+    # family = LAGRANGE
   []
   [H_partial_pressure_air]
     initial_condition = '${initial_pressure_air}'
+    # order = FIRST
+    # family = SCALAR
   []
   [H_mobile_steel_derivative]
     order = FIRST
@@ -168,7 +172,7 @@ dt_start = '${units 1 h -> day}' # 3 hours does not give negative concentration 
   [exact_diffusion_length]
     type = FunctionValuePostprocessor
     function = diffusion_length_fun
-    # outputs = csv_data
+    outputs = csv_data
   []
 
   [gradient_left_boundary]
@@ -191,6 +195,7 @@ dt_start = '${units 1 h -> day}' # 3 hours does not give negative concentration 
     constant_expressions = ${inner_radius}
     constant_names = interface_location
     pp_names = 'interface_concentration gradient_left_boundary'
+    outputs = csv_data
   []
 
   ### 2D Conservation of Mass ###
@@ -206,7 +211,7 @@ dt_start = '${units 1 h -> day}' # 3 hours does not give negative concentration 
     boundary = '0'
     variable = H_mobile_steel
     diffusivity = ${diffusivity_H_in_steel}
-    outputs = csv_data
+    # outputs = csv_data
   []
 
   [outflux]
@@ -214,10 +219,10 @@ dt_start = '${units 1 h -> day}' # 3 hours does not give negative concentration 
     boundary = '1'
     variable = H_mobile_steel
     diffusivity = ${diffusivity_H_in_steel}
-    outputs = csv_data
+    # outputs = csv_data
   []
 
-  [flux_difference]
+  [flux_difference] # Ensure that we are accounting for atomic vs molecular hydrogen
     type = ParsedPostprocessor
     expression = 'outflux - influx'
     pp_names = 'influx outflux'
@@ -239,62 +244,28 @@ dt_start = '${units 1 h -> day}' # 3 hours does not give negative concentration 
     outputs = csv_data
   []
 
-  # [influx3d]
-  #   type = ScalePostprocessor
-  #   value = influx
-  #   # scaling_factor = '${fparse 2*pi*inner_radius*height}' ## Inner boundary of annulus
-  #   scaling_factor = '${height}'
-  #   outputs = csv_data
-  # []
-
-  # [outflux3d]
-  #   type = ScalePostprocessor
-  #   value = outflux
-  #   scaling_factor = '${height}'
-  #   outputs = csv_data
-  # []
-
-  # [3d_flux_difference]
-  #   type = ParsedPostprocessor
-  #   expression = 'outflux3d - influx3d'
-  #   pp_names = 'outflux3d influx3d'
-  #   outputs = csv_data
-  # []
-
-  # [3d_time_integrated_flux]
-  #   type = TimeIntegratedPostprocessor
-  #   value = 3d_flux_difference
-  #   outputs = csv_data
-  # []
-
   [3d_time_integrated_flux]
     type = ScalePostprocessor
     value = time_integrated_flux
     scaling_factor = ${height}
+    outputs = csv_data
   []
 
 
   ### Miscellaneous ###
 
-  # [initial_canister_concentration]
-  #   type = ConstantPostprocessor
-  #   value = '${initial_concentration_gas}' # Currently mols of H2 molecules
-  #   execute_on = 'Initial'
-  #   # outputs = csv_data
-  # []
-
   [initial_total_mass]
     type = ConstantPostprocessor
     value = '${initial_total_mass}' # Currently mols of H2 molecules
     execute_on = 'Initial'
-    # outputs = csv_data
+    outputs = csv_data
   []
 
   [min_steel] # Rough Check for Negative Concentrations
   type = ADElementExtremeFunctorValue
   functor = H_mobile_steel
   value_type = min
-  outputs = csv_data
+  # outputs = csv_data
   []
 
   ### Analytical Solution ###
