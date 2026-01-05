@@ -36,12 +36,12 @@ def plot_data(t, y_data, y_label, title_suffix):
     plt.show()
 
 # Plot for Mobile_gas_center_of_canister
-plot_data(t, Mobile_gas_center_of_canister, 'Mobile_gas_center_of_canister', 'Hydrogen Concentration in Center of Canister')
+plot_data(t, Mobile_gas_center_of_canister, 'Mobile_gas_center_of_canister', 'Molecular Hydrogen Concentration in Center of Canister')
 
 # Plot for gas-steel interface
-plot_data(t, Mobile_gas_interface, 'Mobile_gas_interface', 'Hydrogen Concentration in Gas Phase at Interface')
+plot_data(t, Mobile_gas_interface, 'Mobile_gas_interface', 'Molecular Hydrogen Concentration in Gas Phase at Interface')
 
-plot_data(t, Mobile_steel_interface, 'Mobile_steel_interface', 'Hydrogen Concentration in Steel Phase at Interface')
+plot_data(t, Mobile_steel_interface, 'Mobile_steel_interface', 'Atomic Hydrogen Concentration in Steel Phase at Interface')
 
 # Plot for Mobile_steel_edge_to_air
-plot_data(t, Mobile_steel_edge_to_air, 'Mobile_steel_edge_to_air', 'Hydrogen Concentration at Outside Edge of Canister')
+plot_data(t, Mobile_steel_edge_to_air, 'Mobile_steel_edge_to_air', 'Atomic Hydrogen Concentration at Outside Edge of Canister')

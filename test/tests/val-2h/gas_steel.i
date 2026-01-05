@@ -20,10 +20,12 @@ ideal_gas_constant = '${units 8.31446261815324 J/K/mol -> J/K/mumol}'
 # ideal_gas_constant = '${units 8.31446261815324e-06 J/K/mumol}'
 
 # Initial Concentrations
-initial_concentration_steel = '${units ${fparse initial_pressure_air/(ideal_gas_constant*temperature)} mumol/mm^3}'
+# initial_concentration_steel = '${units ${fparse initial_pressure_air/(ideal_gas_constant*temperature)} mumol/mm^3}'
+initial_concentration_steel = '${units 0 mumol/mm^3}'
 # initial_concentration_gas = '${units ${fparse initial_pressure_gas/(ideal_gas_constant*temperature)} mumol/mm^3}'
-# initial_concentration_gas = '${units 0 mumol/mm^3}'
-initial_concentration_gas = '${units ${fparse 1466.5/gas_volume} mumol/mm^3}'
+initial_concentration_gas = '${units 0 mumol/mm^3}'
+# initial_concentration_gas = '${fparse 197.2501/gas_volume}'
+# initial_concentration_gas = '${units ${fparse 1466.5/gas_volume} mumol/mm^3}'
 # initial_total_mass = '${units 1466.5 mumol}'
 # Parameters Related to Stainless Steel walls of Canister
 # diffusivity_H_in_steel = '${units 2.86e-13 m^2/s -> mm^2/s}' # https://pdf.sciencedirectassets.com/271609/1-s2.0-S0925838800X00473/1-s2.0-S0925838896028460/main.pdf?X-Amz-Security-Token=IQoJb3JpZ2luX2VjEPj%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCXVzLWVhc3QtMSJFMEMCH06lR8h%2BQeV%2F%2BWPSlTbpcAZM6nj0BCSME5n0nB3sYV8CIAx6yxTZ%2BJIpkpARYB7mbXS8CPq4eje8aIuikdKGreuDKrsFCJD%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEQBRoMMDU5MDAzNTQ2ODY1IgwwlLoItAwYQdJrUpMqjwUanStcho50OBvN4WhTU8b3xmuKS%2F3ER%2FwNgfvbKAi9UjXUNGdFWoc%2BcL%2B4bsml3oz1MwH%2BJP9H37JjQJbGyLj2VrKK4k0xhtPu9tE7kFOepedJvcjPmCe3PLBiFJPSI9a2SsLpq0Y%2Bd88w7DIB33OTYTvmVM8pYYrxWq20wVgo3RdIThsjHwxm%2FkDlYwSJpxPe1HcJVEdnRPofYhK4LEJKnjsGyUIFj4tABaAEjYKfg1d0aFgUrev%2BBKJq5rZbt39xr9YifnqRw%2FLQ%2BbIL4E0Cx3dcF%2BszcPkqAb%2FYRn2qBT51vrA444fXv295JpnMjk%2FYJlCfOdq8OrAClOfFt4oVb62bKHnqLK2GOfgXkG%2B1GW051vYghKXzf76SNNvEkcMOaBvJwqPVHk1U2XTA%2FwWli4m1ZwNbxAz%2BMQKdbATLecRit4N07B2eWUb%2FMT8seOcjR0vT2Ih3v6guOzHjmjgvuk61gsjFhhs2j5HqgsjbpTnHoEVuI2kSPGDoesiLjpSRsok4Rtyy%2FfcLy8H46PVs%2FfmEeQnYBicQ63JhAMZ1C6ghuGUGK0XCNs0o5decDxZgVxptfxRc2Kw9%2BZ63M8AQCpkGfHc%2FB3cz%2BL42jNz1GswcZvMKMB6lwvbJCkpa7NHbJViD7CYco3dMzq4xjyNlX92Tzr9r%2ByNpvTXv82kmPVVZkLh5Yh49%2BUxH9RZOOJgj6vdKmCwnQD6ak0Isxl%2BmXanjPXT0pvQLJs5jX%2F5X9z7u2274CLuesgeIOGxeHQJ4j9l7AxgnrDd%2F16wR76WS%2F50o1RZ6RClx9dSlNbK7icZjcODW8X6WATAyiXxeStLbX3jfm4Zh%2FkvbQaw6pQ%2Fjx7EHTOaPqYfDzX4VBrjWMOG2j8cGOrMBWMyoEJbJ9Aq255MIA6N9B%2BgVguUseD%2BbGbnCrjE1M1eBA0Dk9pTkaRKI9t5z0RIO8ajvPj%2F%2B3ia9Y52uwwH2WrV7dDfT8Xg90legndHUEuTBAKyq0sw%2FIm6nXA9bv8OXA3pq%2FY35%2Bwa%2FxK%2Bkp4zIOk7XOUU9Kku8vWN%2BxiMJmppSFPo2jcHkTM2GfAfEBFQ5RySxhPgqL0Pkn1RFzDogFsa396kO5KaUWRE1dZIiVn4kWwE%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20251006T155752Z&X-Amz-SignedHeaders=host&X-Amz-Expires=300&X-Amz-Credential=ASIAQ3PHCVTYSO4WZR6Z%2F20251006%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=b344f187b722db2da048edb3013670503007a603e4fc950277ac4b2fb309062b&hash=d09ced7b2aa14f89e8b753abc7a3c3143071f7d4774644da6e7f73ca1e99fcd2&host=68042c943591013ac2b2430a89b270f6af2c76d8dfd086a07176afe7c76c2c61&pii=S0925838896028460&tid=spdf-801f8509-398d-47ac-8572-298a70b38a7c&sid=48da626760d6e841fa58b19662bd1d4a88c7gxrqa&type=client&tsoh=d3d3LnNjaWVuY2VkaXJlY3QuY29t&rh=d3d3LnNjaWVuY2VkaXJlY3QuY29t&ua=10145a5d075951075550&rr=98a65b63fb2da3b6&cc=us
@@ -44,17 +46,18 @@ solubility_activation_energy_in_steel = '${units 6.86 kJ/mol -> J/mumol}'
 
 # Mesh
 num_intervals_steel = 5000
-num_intervals_gas = '${fparse int(num_intervals_steel * inner_radius / steel_thickness)}' # How to round? Gives roughly same element length in two blocks
+num_intervals_gas = '${fparse int(num_intervals_steel * inner_radius / steel_thickness)}' #Gives roughly same element length in two blocks
 
 # Numerics
-dt_max = '${units 7 day}'
-dt_min = '${units 1 h -> day}'
-# endtime = '${units 1 year -> day}'
+dt_max = '${units 30 day}'
+dt_min = '${units 1 s -> day}'
 endtime = '${units 0.25 year -> day}'
-dt_start = '${units 1 h -> day}' # 3 hours does not give negative concentration for current input parameters
+# endtime = '${units 0.25 year -> day}'
+# dt_start = '${units 0.125 day -> day}'
+dt_start = '${units 300 s -> day}' # nonlinear source functions need smaller timestep for solver to converge
 
 [Mesh]
-  coord_type = 'RZ' # Specify 2D axisymmetric coordinates
+  coord_type = 'RZ' # Specify 2D axisymmetric coordinates. My hunch is that the boundary integrals applied do not cover the top and bottom of a cylinder.
   rz_coord_axis = Y # Specifies X is radial direction and Y is axial coordinate
 
   [total_length]
@@ -94,8 +97,11 @@ dt_start = '${units 1 h -> day}' # 3 hours does not give negative concentration 
 []
 
 [AuxVariables]
-  [H_partial_pressure_air]
+  [H_partial_pressure_air] # Need this for EquilibriumBC even though it is constant
+    order = First
+    family = SCALAR
     initial_condition = '${initial_pressure_air}'
+    outputs = none
   []
 []
 
@@ -111,13 +117,14 @@ dt_start = '${units 1 h -> day}' # 3 hours does not give negative concentration 
     diffusivity = '${diffusivity_H_in_gas}'
     block = 0
   []
-  # [gas_source]
-  #   type = ADBodyForce
-  #   variable = H_mobile_gas
-  #   block = 0
-  #   value = ${fparse 1466.5/endtime}
-  #   # value = 1466.5
-  # []
+  [gas_source] ## SRNL data can be used here for crude generation term
+    type = ADBodyForce
+    variable = H_mobile_gas
+    block = 0
+    # value = ${fparse 1466.5/(gas_volume*endtime)} # Peak of SRNL total mass reported divided by volume and time to give proper units mumol/(mm^3 day)
+    # Function fit of time vs total mass from SRNL data
+    function = gas_generation_rhs_fun
+  []
 
   [steel_mobile_time]
     type = ADTimeDerivative
@@ -177,11 +184,27 @@ dt_start = '${units 1 h -> day}' # 3 hours does not give negative concentration 
   []
 []
 
+[Functions]
+  [gas_generation_fun] # fit for total mass data against time (mumol vs days assuming 124.7 Gy/min dosage rate)
+    type = ParsedFunction
+    expression = '(15.2312 * t + 197.2501)' # linear least squares fit
+    # expression = '69.7055*t^0.6808' # Power model linear least squares fit
+    # expression = 'if(t<=4.5, 69.7055*t^0.6808, 425.6314*log(t) - 614.5072)' # log linear least squares fit avoiding negative fit in early timesteps
+  []
+  [gas_generation_rhs_fun] # Take time derivative and divide by volume to get mumol/mm^3/day
+    type = ParsedFunction
+    expression = '15.2312/${gas_volume}' # derivative of linear fit
+    # expression = '69.7055*0.6808*t^(0.6808-1)/${gas_volume}' # derivative of power fit
+    # expression = 'if(t<=4.5,69.7055*0.6808*t^(0.6808-1)/${gas_volume},425.6314/t/${gas_volume})' # derivative of log fit
+    # expression = '425.6314/t/${gas_volume}'
+  []
+[]
+
 [Postprocessors]
 
   ### POINTS OF INTEREST ###
 
-  [Mobile_gas_interface] # Needed to replace malfunctioning vpp
+  [Mobile_gas_interface]
     type = PointValue
     point = '${inner_radius} 0 0'
     variable = H_mobile_gas
@@ -208,36 +231,81 @@ dt_start = '${units 1 h -> day}' # 3 hours does not give negative concentration 
 
   # Volume Integral Calculations #
 
-  [circle_concentration_gas] # Axisymmetric: 2D Integral of Annulus Cross section ; Cartesian: 1D Integral of line cross section
+  [circle_concentration_gas] # Axisymmetric: 2D Integral of inner circle Cross section
     type = ElementIntegralVariablePostprocessor
     variable = H_mobile_gas
     block = '0'
     outputs = csv_data
   []
 
-  [circle_concentration_steel] # Axisymmetric: 2D Integral of Annulus Cross section ; Cartesian: 1D Integral of line cross section
+  [circle_concentration_steel] # Axisymmetric: 2D Integral of outer Ring Cross section
     type = ElementIntegralVariablePostprocessor
     variable = H_mobile_steel
     block = '1'
     outputs = csv_data
   []
 
-  [circle_concentration] # Axisymmetric: 2D Integral of Annulus Cross section
-    type = SumPostprocessor
-    values = 'circle_concentration_gas circle_concentration_steel'
+  [circle_concentration] # Account for Atomic hydrogen
+    type = ParsedPostprocessor
+    expression = '2*circle_concentration_gas + circle_concentration_steel'
+    pp_names = 'circle_concentration_gas circle_concentration_steel'
     outputs = csv_data
   []
 
-  [cylinder_total_mass] # Total Mass used for validation
+  [cylinder_total_mass_steel]
+    type = ScalePostprocessor
+    value = circle_concentration_steel
+    scaling_factor = '${height}'
+    # outputs = csv_data
+  []
+
+  [cylinder_total_mass_gas]
+    type = ScalePostprocessor
+    value = circle_concentration_gas
+    scaling_factor = '${fparse 2*height}'
+    # outputs = csv_data
+  []
+
+  [cylinder_total_mass]
     type = ScalePostprocessor
     value = circle_concentration
     scaling_factor = '${height}'
     outputs = csv_data
   []
 
+  ### Source Term Adjustments ###
+
+  [circle_generation_molecular] # Integral of Source function on circlular cross section giving units of mumol/mm/day
+    type = FunctionElementIntegral
+    function = gas_generation_rhs_fun
+    # function = unity
+    block = '0'
+    outputs = csv_data
+  []
+
+  [circle_generation]
+    type = ScalePostprocessor
+    value = circle_generation_molecular
+    scaling_factor = 2
+    outputs = csv_data
+  []
+
+  [circle_time_integrated_generation] # Integrate in time to get mumol/mm
+    type = TimeIntegratedPostprocessor
+    value = circle_generation
+    outputs = csv_data
+  []
+
+  [cylinder_time_integrated_generation] # Extrude source to cylinder giving total mass with units of mumol and account for atomic hydrogen
+    type = ScalePostprocessor
+    value = circle_time_integrated_generation
+    scaling_factor = '${height}'
+    outputs = csv_data
+  []
+
   # Flux Calculations
 
-  [influx]
+  [circle_influx] # Influx at the center of canister measured on a single point in RZ coordinates, so this is a integral on a 1D domain. I suspect this value is the same regardless of cartesian or RZ
     type = ADSideDiffusiveFluxIntegral
     boundary = '0'
     variable = H_mobile_gas
@@ -245,7 +313,7 @@ dt_start = '${units 1 h -> day}' # 3 hours does not give negative concentration 
     outputs = csv_data
   []
 
-  [outflux]
+  [circle_outflux] # outflux on edges of cylinder.
     type = ADSideDiffusiveFluxIntegral
     boundary = '1'
     variable = H_mobile_steel
@@ -253,153 +321,25 @@ dt_start = '${units 1 h -> day}' # 3 hours does not give negative concentration 
     outputs = csv_data
   []
 
-  [flux_difference]
+  [circle_flux_difference]
     type = ParsedPostprocessor
-    expression = 'outflux - influx'
-    pp_names = 'influx outflux'
+    expression = 'circle_outflux - 2*circle_influx' # No source term and zero Initial condition
+    pp_names = 'circle_influx circle_outflux'
     outputs = csv_data
   []
 
-  [time_integrated_flux]
+  [circle_time_integrated_flux]
     type = TimeIntegratedPostprocessor
-    value = flux_difference
-    # outputs = csv_data
+    value = circle_flux_difference
+    outputs = csv_data
   []
 
-  # # Gas Block #
-
-  # [influx_gas_center]
-  #   type = ADSideDiffusiveFluxIntegral
-  #   boundary = '0'
-  #   variable = H_mobile_gas
-  #   diffusivity = ${diffusivity_H_in_gas}
-  #   outputs = csv_data
-  # []
-
-  # [outflux_gas_to_steel]
-  #   type = ADSideDiffusiveFluxIntegral
-  #   boundary = interface_gas_to_steel
-  #   variable = H_mobile_gas
-  #   diffusivity = ${diffusivity_H_in_gas}
-  #   outputs = csv_data
-  # []
-
-  # [gas_flux_difference]
-  #   type = ParsedPostprocessor
-  #   expression = 'outflux_gas_to_steel - influx_gas_center'
-  #   pp_names = 'influx_gas_center outflux_gas_to_steel'
-  #   outputs = csv_data
-  # []
-
-  # [gas_time_integrated_flux]
-  #   type = TimeIntegratedPostprocessor
-  #   value = gas_flux_difference
-  #   outputs = csv_data
-  # []
-
-  # # Steel Block
-
-  # [influx_gas_to_steel]
-  #   type = ADSideDiffusiveFluxIntegral
-  #   boundary = interface_steel_to_gas
-  #   variable = H_mobile_steel
-  #   diffusivity = ${diffusivity_H_in_steel}
-  #   outputs = csv_data
-  # []
-
-  # [outflux_steel_to_air]
-  #   type = ADSideDiffusiveFluxIntegral
-  #   boundary = '1'
-  #   variable = H_mobile_steel
-  #   diffusivity = ${diffusivity_H_in_steel}
-  #   outputs = csv_data
-  # []
-
-  # [steel_flux_difference]
-  #   type = ParsedPostprocessor
-  #   expression = 'outflux_steel_to_air - influx_gas_to_steel'
-  #   pp_names = 'influx_gas_to_steel outflux_steel_to_air'
-  #   outputs = csv_data
-  # []
-
-  # [steel_time_integrated_flux]
-  #   type = TimeIntegratedPostprocessor
-  #   value = steel_flux_difference
-  #   outputs = csv_data
-  # []
-
-  ### 3D Conservation of Mass ###
-
-  # # Gas Block #
-  # [annulus_gas_total_mass] ## Extruded concentration of annulus
-  #   type = ScalePostprocessor
-  #   value = circle_concentration_gas
-  #   scaling_factor = '${height}'
-  #   outputs = csv_data
-  # []
-
-  # [annulus_gas_influx]
-  #   type = ScalePostprocessor
-  #   value = influx
-  #   scaling_factor = '${height}'
-  #   outputs = csv_data
-  # []
-
-  # [annulus_gas_outflux]
-  #   type = ScalePostprocessor
-  #   value = outflux
-  #   scaling_factor = '${height}'
-  #   outputs = csv_data
-  # []
-
-  # [annulus_gas_flux_difference]
-  #   type = ParsedPostprocessor
-  #   expression = 'outflux3d - influx3d'
-  #   pp_names = 'outflux3d influx3d'
-  #   outputs = csv_data
-  # []
-
-  # [annulus_gas_time_integrated_flux]
-  #   type = TimeIntegratedPostprocessor
-  #   value = annulus_gas_flux_difference
-  #   outputs = csv_data
-  # []
-
-  # # Steel Block #
-
-  # [annulus_steel_total_mass] ## Extruded concentration of annulus
-  #   type = ScalePostprocessor
-  #   value = circle_concentration_steel
-  #   scaling_factor = '${height}'
-  #   outputs = csv_data
-  # []
-
-  # [annulus_steel_influx]
-  #   type = ScalePostprocessor
-  #   value = influx
-  #   scaling_factor = '${height}'
-  #   outputs = csv_data
-  # []
-
-  # [annulus_steel_outflux]
-  #   type = ScalePostprocessor
-  #   value = outflux
-  #   scaling_factor = '${height}'
-  #   outputs = csv_data
-  # []
-
-  # [annulus_steel_flux_difference]
-  #   type = ParsedPostprocessor
-  #   expression = 'outflux3d - influx3d'
-  #   pp_names = 'outflux3d influx3d'
-  #   outputs = csv_data
-  # []
-
-  # [annulus_steel_time_integrated_flux]
-  #   type = TimeIntegratedPostprocessor
-  #   value = annulus_steel_flux_difference
-  #   outputs = csv_data
-  # []
+  [cylinder_time_integrated_flux]
+    type = ScalePostprocessor
+    value = circle_time_integrated_flux
+    scaling_factor = ${height}
+    outputs = csv_data
+  []
 
   ### Miscellaneous ###
 
@@ -415,7 +355,7 @@ dt_start = '${units 1 h -> day}' # 3 hours does not give negative concentration 
   type = ADElementExtremeFunctorValue
   functor = H_mobile_steel
   value_type = min
-  outputs = csv_data
+  # outputs = csv_data
   block = '1'
   []
 []
@@ -435,6 +375,10 @@ dt_start = '${units 1 h -> day}' # 3 hours does not give negative concentration 
   # dt = '${dt_start}'
   solve_type = Newton
   automatic_scaling = true
+  # compute_scaling_once = false
+  # steady_state_detection = true
+  # steady_state_tolerance = 1e-04
+  # steady_state_start_time = 365.25
   petsc_options_iname = '-pc_type'
   petsc_options_value = 'lu'
   # petsc_options_iname = '-pc_type -pc_hypre_type -ksp_type'
@@ -444,25 +388,36 @@ dt_start = '${units 1 h -> day}' # 3 hours does not give negative concentration 
   # petsc_options_value = '0.5' # add  vinewtonrsls if bounds system active
   line_search = NONE
   nl_max_its = 50
-  # nl_abs_tol = 1e-10
-  # nl_rel_tol = 1e-04
+  # nl_abs_tol = 1e-50
+  # nl_rel_tol = 1e-08
+  # nl_abs_tol = 1e-20
+  nl_rel_tol = 1e-06
   end_time = ${endtime}
-  # steady_state_detection = true
-  [TimeStepper]
-    type = IterationAdaptiveDT
-    dt = ${dt_start}
-    optimal_iterations = 5
-    growth_factor = 1.1
-    cutback_factor_at_failure = .9
+  [TimeSteppers]
+    [Adaptive]
+      type = IterationAdaptiveDT
+      dt = ${dt_start}
+      optimal_iterations = 5
+      growth_factor = 1.1
+      cutback_factor_at_failure = .9
+    []
+    # [Sequence] # Time points for SRNL to ensure proper checking of RMSPE
+    #   type = TimeSequenceStepper
+    #   time_sequence = '2.968189964157706 8.512544802867382 14.112903225806450 19.657258064516125 27.665770609318994 33.154121863799283 38.642473118279561 46.426971326164868 51.075268817204297 56.563620071684582 66.084229390680989 76.164874551971309 81.765232974910376 87.365591397849443'
+    # []
   []
 []
 
 [Outputs]
   # print_linear_residuals = true
-  exodus = true
+  # exodus = true
   [csv_data]
     type = CSV
     file_base = 'csv_data/verification_RZ'
     execute_on = 'TIMESTEP_END'
   []
 []
+
+# [Debug]
+#   show_var_residual_norms = true
+# []

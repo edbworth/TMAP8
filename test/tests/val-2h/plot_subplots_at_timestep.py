@@ -53,7 +53,7 @@ def subplot_bar_profile(timestep, data_dir='csv_data'):
     ax1.plot(gas_x, gas_values, color='blue')
     ax1.set_xlim(gas_x.min(), gas_x.max())
     ax1.set_ylim(gas_values.min()*0.995, gas_values.max()*1.005)
-    ax1.set_ylabel(r'Concentration in Gas ($\mu$mol/mm$^3$)')
+    ax1.set_ylabel(r'Molecular H$_2$ Concentration in Gas ($\mu$mol/mm$^3$)')
     ax1.set_title(f'Timestep {timestep} at Time: {time[timestep-1]:01.2f} days')
     ax1.grid(True)
 
@@ -61,7 +61,7 @@ def subplot_bar_profile(timestep, data_dir='csv_data'):
     ax2.plot(steel_x, steel_values, color='green')
     ax2.set_xlim(steel_x.min(), steel_x.max())
     ax2.set_ylim(steel_values.min(), steel_values.max())
-    ax2.set_ylabel(r'Concentration in Steel ($\mu$mol/mm^3)')
+    ax2.set_ylabel(r'Atomic H Concentration in Steel ($\mu$mol/mm^3)')
     ax2.set_xlabel('Distance from Canister Center (mm)')
     # ax2.set_title(f'Steel - Timestep {timestep}')
     ax2.grid(True)
