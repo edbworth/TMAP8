@@ -6,6 +6,7 @@ import glob
 # Load CSV data
 # data = pd.read_csv('csv_data_steel_only/verification.csv') # CHANGE BELOW TOO
 data = pd.read_csv('csv_data_steel_only/verification_RZ.csv')
+parameter_study_data = pd.read_csv('peak_pressures.csv')
 
 interface_location = 35.941 # mm
 
@@ -23,13 +24,52 @@ simulated_diffusion_length = data['simulated_diffusion_length']
 # initial_canister_concentration = 2*data['initial_canister_concentration'] # Count Atomic Hydrogen
 initial_total_mass = 2*data['initial_total_mass'] # Count Atomic Hydrogen
 
+# # Pressure Paramter Study
+# pressure = parameter_study_data['pressure']
+# yields = parameter_study_data['yield']
+
+# # Pressure Parameter Study
+# plt.figure(figsize=(10, 6))
+# plt.plot(pressure,yields,'ro')
+# plt.ylabel(r'H Total Mass ($\mu$mol)')
+# plt.xlabel('Pressure (psi)')
+# plt.title(f'Atomic Hydrogen in Steel over 1-10% Hydrogen Content in 24 psi He Backfill')
+# plt.xlim(0)
+# plt.ylim(0)
+# plt.grid(True)
+# plt.tight_layout()
+# plt.show()
+
+# plt.figure(figsize=(10, 6))
+# plt.plot(pressure,yields/initial_total_mass[0]*100)
+# plt.ylabel('Percentage (%)')
+# plt.xlabel('Pressure (psi)')
+# plt.title(f'Atomic Hydrogen in Steel over 1-10% Hydrogen Content in 24 psi He Backfill')
+# plt.xlim(0)
+# plt.ylim(0)
+# plt.grid(True)
+# plt.tight_layout()
+# plt.show()
+
+# Time plot
+plt.figure(figsize=(10, 6))
+plt.plot(t,annulus_total_mass)
+plt.ylabel(r'H Total Mass ($\mu$mol)')
+plt.xlabel('Time (days)')
+plt.title(f'Atomic Hydrogen in Steel of 3D Annulus vs Time')
+plt.xlim(0)
+plt.ylim(0)
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
 # Percentage of Hydrogen in steel vs hydrogen in canister
 plt.figure(figsize=(10, 6))
 # plt.plot(t,100*annulus_total_mass/initial_canister_concentration) # Total mass vs concentration?? Units off
 plt.plot(t,100*annulus_total_mass/initial_total_mass)
 plt.ylabel('Percentage %')
 plt.xlabel('Time (days)')
-plt.title(f'Percentage of Total Hydrogen in Steel')
+plt.title(f'Percentage of Total Hydrogen in Steel (Assuming Peak SRNL Yield)')
 plt.xlim(0)
 plt.ylim(0)
 plt.grid(True)
@@ -43,7 +83,7 @@ plt.plot(t,simulated_diffusion_length, label =f'Simulated Diffusion Length')
 RMSE = np.sqrt(np.mean((simulated_diffusion_length - exact_diffusion_length)**2))
 RMSPE = RMSE*np.sqrt(num_time_steps)/np.mean(exact_diffusion_length)
 print(f'RMSPE = %.2f '%RMSPE+'%')
-plt.text(150,0.1, 'RMSPE = %.2f '%RMSPE+'%',fontweight='bold')
+plt.text(80,0.1, 'RMSPE = %.2f '%RMSPE+'%',fontweight='bold')
 plt.legend()
 plt.ylabel('Length (mm)')
 plt.xlabel('Time (days)')
@@ -58,7 +98,7 @@ plt.show()
 
 plt.figure(figsize=(10, 6))
 plt.plot(t,abs(exact_diffusion_length - simulated_diffusion_length))
-plt.text(150,0.005, 'RMSPE = %.2f '%RMSPE+'%',fontweight='bold')
+plt.text(80,0.005, 'RMSPE = %.2f '%RMSPE+'%',fontweight='bold')
 plt.legend()
 plt.ylabel('Difference in Length (mm)')
 plt.xlabel('Time (days)')
@@ -106,29 +146,18 @@ plt.show()
 # ax_secondary.tick_params(axis='x', which='both', labelrotation=45, labelsize=8)  # Adjust tick parameters
 # plt.show()
 
-# Adsorbed Dose plot
-plt.figure(figsize=(10, 6))
-plt.plot(absorbed_dose,annulus_total_mass)
-plt.ylabel(r'H Total Mass ($\mu$mol)')
-plt.xlabel('Absorbed Dose (MGy)')
-plt.title(f'Atomic Hydrogen in Steel of 3D Annulus vs Dose')
-plt.xlim(0)
-plt.ylim(0)
-plt.grid(True)
-plt.tight_layout()
-plt.show()
+# # Adsorbed Dose plot
+# plt.figure(figsize=(10, 6))
+# plt.plot(absorbed_dose,annulus_total_mass)
+# plt.ylabel(r'H Total Mass ($\mu$mol)')
+# plt.xlabel('Absorbed Dose (MGy)')
+# plt.title(f'Atomic Hydrogen in Steel of 3D Annulus vs Dose')
+# plt.xlim(0)
+# plt.ylim(0)
+# plt.grid(True)
+# plt.tight_layout()
+# plt.show()
 
-# Time plot
-plt.figure(figsize=(10, 6))
-plt.plot(t,annulus_total_mass)
-plt.ylabel(r'H Total Mass ($\mu$mol)')
-plt.xlabel('Time (days)')
-plt.title(f'Atomic Hydrogen in Steel of 3D Annulus vs Time')
-plt.xlim(0)
-plt.ylim(0)
-plt.grid(True)
-plt.tight_layout()
-plt.show()
 
 # Measure and Plot Conservation of Mass in 2D (for axisymmetric coordinates)
 plt.figure(figsize=(10, 6))
@@ -166,7 +195,7 @@ plt.plot(t,annulus_total_mass, label = 'Total Mass in Annulus')
 RMSE = np.sqrt(np.mean((annulus_total_mass - annulus_flux)**2))
 RMSPE = RMSE*np.sqrt(num_time_steps)/np.mean(annulus_total_mass)
 print(f'RMSPE = %.2f '%RMSPE+'%')
-plt.text(150,100, 'RMSPE = %.2f '%RMSPE+'%',fontweight='bold')
+plt.text(150,5, 'RMSPE = %.2f '%RMSPE+'%',fontweight='bold')
 plt.xlabel('Time (Days)')
 plt.ylabel(r'$\mu$mol H')
 plt.title(f'Conservation of Mass: 3D Annulus')

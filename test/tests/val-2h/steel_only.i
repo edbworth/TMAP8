@@ -13,39 +13,38 @@ height = '${units 7.06 in -> mm}'
 
 # Ambient Physical & Chemical Parameters
 temperature = '${units 313.15 K}' # mild temp
-initial_pressure_gas = '${units 2.4 psi -> Pa}' # Anywhere from 1-10% of 24 psi
+
+# initial_pressure_gas = '${units 2.4 psi -> Pa}' # Anywhere from 1-10% of 24 psi
+estimated_pressure_gas = '${units ${fparse 24*0.10} psi -> Pa}' # Fit SRNL data
+
 # initial_pressure_air = '${units 0.051 Pa}' # Hydrogen in atmosphere is negligible?
 initial_pressure_air = '${units 0 psi -> Pa}'
 ideal_gas_constant = '${units 8.31446261815324 J/K/mol -> J/K/mumol}'
-# ideal_gas_constant = '${units 8.31446261815324e-06 J/K/mumol}'
 
 # Initial Concentrations
-initial_concentration_steel = '${units ${fparse initial_pressure_air/(ideal_gas_constant*temperature)} mumol/mm^3}'
-# initial_concentration_gas = '${units ${fparse initial_pressure_gas/(ideal_gas_constant*temperature)} mumol/mm^3}'
-initial_total_mass = '${units 1466.5 mumol}' # atoms of hydrogen
-# Parameters Related to Stainless Steel walls of Canister
-# diffusivity_H_in_steel = '${units 2.86e-13 m^2/s -> mm^2/s}' # https://pdf.sciencedirectassets.com/271609/1-s2.0-S0925838800X00473/1-s2.0-S0925838896028460/main.pdf?X-Amz-Security-Token=IQoJb3JpZ2luX2VjEPj%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCXVzLWVhc3QtMSJFMEMCH06lR8h%2BQeV%2F%2BWPSlTbpcAZM6nj0BCSME5n0nB3sYV8CIAx6yxTZ%2BJIpkpARYB7mbXS8CPq4eje8aIuikdKGreuDKrsFCJD%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEQBRoMMDU5MDAzNTQ2ODY1IgwwlLoItAwYQdJrUpMqjwUanStcho50OBvN4WhTU8b3xmuKS%2F3ER%2FwNgfvbKAi9UjXUNGdFWoc%2BcL%2B4bsml3oz1MwH%2BJP9H37JjQJbGyLj2VrKK4k0xhtPu9tE7kFOepedJvcjPmCe3PLBiFJPSI9a2SsLpq0Y%2Bd88w7DIB33OTYTvmVM8pYYrxWq20wVgo3RdIThsjHwxm%2FkDlYwSJpxPe1HcJVEdnRPofYhK4LEJKnjsGyUIFj4tABaAEjYKfg1d0aFgUrev%2BBKJq5rZbt39xr9YifnqRw%2FLQ%2BbIL4E0Cx3dcF%2BszcPkqAb%2FYRn2qBT51vrA444fXv295JpnMjk%2FYJlCfOdq8OrAClOfFt4oVb62bKHnqLK2GOfgXkG%2B1GW051vYghKXzf76SNNvEkcMOaBvJwqPVHk1U2XTA%2FwWli4m1ZwNbxAz%2BMQKdbATLecRit4N07B2eWUb%2FMT8seOcjR0vT2Ih3v6guOzHjmjgvuk61gsjFhhs2j5HqgsjbpTnHoEVuI2kSPGDoesiLjpSRsok4Rtyy%2FfcLy8H46PVs%2FfmEeQnYBicQ63JhAMZ1C6ghuGUGK0XCNs0o5decDxZgVxptfxRc2Kw9%2BZ63M8AQCpkGfHc%2FB3cz%2BL42jNz1GswcZvMKMB6lwvbJCkpa7NHbJViD7CYco3dMzq4xjyNlX92Tzr9r%2ByNpvTXv82kmPVVZkLh5Yh49%2BUxH9RZOOJgj6vdKmCwnQD6ak0Isxl%2BmXanjPXT0pvQLJs5jX%2F5X9z7u2274CLuesgeIOGxeHQJ4j9l7AxgnrDd%2F16wR76WS%2F50o1RZ6RClx9dSlNbK7icZjcODW8X6WATAyiXxeStLbX3jfm4Zh%2FkvbQaw6pQ%2Fjx7EHTOaPqYfDzX4VBrjWMOG2j8cGOrMBWMyoEJbJ9Aq255MIA6N9B%2BgVguUseD%2BbGbnCrjE1M1eBA0Dk9pTkaRKI9t5z0RIO8ajvPj%2F%2B3ia9Y52uwwH2WrV7dDfT8Xg90legndHUEuTBAKyq0sw%2FIm6nXA9bv8OXA3pq%2FY35%2Bwa%2FxK%2Bkp4zIOk7XOUU9Kku8vWN%2BxiMJmppSFPo2jcHkTM2GfAfEBFQ5RySxhPgqL0Pkn1RFzDogFsa396kO5KaUWRE1dZIiVn4kWwE%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20251006T155752Z&X-Amz-SignedHeaders=host&X-Amz-Expires=300&X-Amz-Credential=ASIAQ3PHCVTYSO4WZR6Z%2F20251006%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=b344f187b722db2da048edb3013670503007a603e4fc950277ac4b2fb309062b&hash=d09ced7b2aa14f89e8b753abc7a3c3143071f7d4774644da6e7f73ca1e99fcd2&host=68042c943591013ac2b2430a89b270f6af2c76d8dfd086a07176afe7c76c2c61&pii=S0925838896028460&tid=spdf-801f8509-398d-47ac-8572-298a70b38a7c&sid=48da626760d6e841fa58b19662bd1d4a88c7gxrqa&type=client&tsoh=d3d3LnNjaWVuY2VkaXJlY3QuY29t&rh=d3d3LnNjaWVuY2VkaXJlY3QuY29t&ua=10145a5d075951075550&rr=98a65b63fb2da3b6&cc=us
+# initial_concentration_steel = '${units ${fparse initial_pressure_air/(ideal_gas_constant*temperature)} mumol/mm^3}'
+initial_concentration_steel = '${units 0 mumol/mm^3}'
+initial_total_mass = '${units 1466.5 mumol}' # molecular hydrogen
 
 # Hydrogen Diffusivity in Steel
 diffusivity_preexponential_factor_in_steel = '${units 0.20e-6 m^2/s -> mm^2/day}'
 diffusivity_activation_energy_in_steel = '${units 49.3 kJ/mol -> J/mumol}'
-diffusivity_H_in_steel = '${fparse diffusivity_preexponential_factor_in_steel * exp(-diffusivity_activation_energy_in_steel/(ideal_gas_constant*temperature))}'
+diffusivity_H_in_steel = '${units ${fparse diffusivity_preexponential_factor_in_steel * exp(-diffusivity_activation_energy_in_steel/(ideal_gas_constant*temperature))} mm^2/day}'
 
 # Hydrogen Solubility in Steel
-# solubility_preexponential_factor_in_steel = '${units 2.66e5 mol/m^3/Pa -> mumol/mm^3/Pa}' #https://www.sandia.gov/app/uploads/sites/158/2021/12/1500TechRef_ferriticSS.pdf
+#https://www.sandia.gov/app/uploads/sites/158/2021/12/1500TechRef_ferriticSS.pdf
 solubility_preexponential_factor_in_steel = '${units 266e-3 mol/m^3/Pa -> mumol/mm^3/Pa}' #sqrt Pa used in BC due to sievert's law
 solubility_activation_energy_in_steel = '${units 6.86 kJ/mol -> J/mumol}'
-# solubility_H_in_steel = '${fparse solubility_preexponential_factor_in_steel * exp(-solubility_activation_energy_in_steel/(ideal_gas_constant*temperature))}'
 
 # Mesh
 num_intervals_steel = 5000
 
 # Numerics
 dt_max = '${units 7 day -> day}'
-dt_min = '${units 1 h -> day}'
-endtime = '${units 10 year -> day}'
+dt_min = '${units 1 s -> day}'
+endtime = '${units 1 year -> day}'
 # endtime = '${units 0.25 year -> day}'
-dt_start = '${units 1 h -> day}' # 3 hours does not give negative concentration for current input parameters
+dt_start = '${units 300 s -> day}' # 3 hours does not give negative concentration for current input parameters
 
 [Mesh]
   coord_type = 'RZ' # Specify 2D axisymmetric coordinates
@@ -66,8 +65,8 @@ dt_start = '${units 1 h -> day}' # 3 hours does not give negative concentration 
 []
 
 [AuxVariables]
-  [H_partial_pressure_gas] # No initial condition as pressure is ramped up
-  # initial_condition = '${initial_pressure_gas}'
+  [H_partial_pressure_gas]
+  initial_condition = 0
     # order = FIRST
     # family = LAGRANGE
   []
@@ -83,13 +82,14 @@ dt_start = '${units 1 h -> day}' # 3 hours does not give negative concentration 
 []
 
 [AuxKernels]
-  [ramping_pressure] # Pressure term starts at zero and ramps up over time
+  [pressure_fit] # Pressure term starts at zero and ramps up over time
     type = FunctionAux
-    function = time_ramp_pressure
+    # function = time_ramp_pressure
+    function = SRNL_pressure_data_fun
     variable = H_partial_pressure_gas
   []
 
-  [concentration_gradient_left_boundary]
+  [concentration_gradient_left_boundary] # For Diffusion length calculation
     type = DiffusionFluxAux
     component = x
     diffusion_variable = H_mobile_steel
@@ -126,9 +126,10 @@ dt_start = '${units 1 h -> day}' # 3 hours does not give negative concentration 
     Ko = '${solubility_preexponential_factor_in_steel}'
     boundary = '0'
     activation_energy = '${solubility_activation_energy_in_steel}'
-    enclosure_var = H_partial_pressure_gas # Should include time scaling from Aux Kernel
+    enclosure_var = H_partial_pressure_gas
     variable = H_mobile_steel
-    temperature = '${temperature}'
+    # temperature = '${temperature}'
+    temperature = '${fparse temperature*1e-6}'
     p = 0.5 #Sievert's Law
   []
 
@@ -139,7 +140,8 @@ dt_start = '${units 1 h -> day}' # 3 hours does not give negative concentration 
     activation_energy = '${solubility_activation_energy_in_steel}'
     enclosure_var = H_partial_pressure_air
     variable = H_mobile_steel
-    temperature = '${temperature}'
+    # temperature = '${temperature}'
+    temperature = '${fparse temperature*1e-6}'
     p = 0.5 #Sievert's Law
   []
 []
@@ -147,9 +149,14 @@ dt_start = '${units 1 h -> day}' # 3 hours does not give negative concentration 
 [Functions]
   [time_ramp_pressure]
     type = TimeRampFunction
-    final_value = '${initial_pressure_gas}'
+    final_value = '${estimated_pressure_gas}'
     initial_value = 0
-    ramp_duration = '${units 1 day -> day}'
+    ramp_duration = '${units 3 h -> day}'
+    # ramp_duration = '${endtime}'
+  []
+  [SRNL_pressure_data_fun]
+    type = ParsedFunction
+    expression = '1e3*0.3768*t^0.6177' # Fit in kPa and multiplied to Pa
   []
   [diffusion_length_fun]
     type = ParsedFunction
@@ -169,7 +176,7 @@ dt_start = '${units 1 h -> day}' # 3 hours does not give negative concentration 
 
   ## Length of Diffusion Front ##
 
-  [exact_diffusion_length]
+  [exact_diffusion_length] # Correct only for time independent boundary condition
     type = FunctionValuePostprocessor
     function = diffusion_length_fun
     outputs = csv_data
@@ -211,7 +218,7 @@ dt_start = '${units 1 h -> day}' # 3 hours does not give negative concentration 
     boundary = '0'
     variable = H_mobile_steel
     diffusivity = ${diffusivity_H_in_steel}
-    # outputs = csv_data
+    outputs = csv_data
   []
 
   [outflux]
@@ -219,7 +226,7 @@ dt_start = '${units 1 h -> day}' # 3 hours does not give negative concentration 
     boundary = '1'
     variable = H_mobile_steel
     diffusivity = ${diffusivity_H_in_steel}
-    # outputs = csv_data
+    outputs = csv_data
   []
 
   [flux_difference] # Ensure that we are accounting for atomic vs molecular hydrogen
@@ -316,7 +323,7 @@ dt_start = '${units 1 h -> day}' # 3 hours does not give negative concentration 
   scheme = bdf2
   dtmax = '${dt_max}'
   dtmin = '${dt_min}'
-  # dt = '${dt_start}'
+  dt = '${dt_start}'
   solve_type = Newton
   # automatic_scaling = true
   petsc_options_iname = '-pc_type'
@@ -343,7 +350,7 @@ dt_start = '${units 1 h -> day}' # 3 hours does not give negative concentration 
 
 [Outputs]
   # print_linear_residuals = true
-  exodus = true
+  # exodus = true
   [csv_data]
     type = CSV
     file_base = 'csv_data_steel_only/verification_RZ'

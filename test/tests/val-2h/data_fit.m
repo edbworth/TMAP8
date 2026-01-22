@@ -2,9 +2,10 @@ clc
 clear
 close all
 T = readtable("SRNL_data.csv")
-Dose = T.Dose_MGy_
-Time = Dose*365.25/65.21904 % Convert from dose to days assuming 124 Gy/min dosing
-H2_yield = T.Cum_H2Yield__mol_
+Dose = [T.Dose_MGy_]
+Time = [Dose*365.25/65.21904] % Convert from dose to days assuming 124 Gy/min dosing
+H2_yield = [T.Cum_H2Yield__mol_]
+Partial_pressure = [T.GasPressure_kPa_].*[T.H2GasFraction___]/100
 
 %%
 
