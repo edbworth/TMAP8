@@ -14,6 +14,7 @@ interface_location = 35.941 # mm
 t = data['time']
 absorbed_dose = t*65.21904/365.25 # Roughly 50 MGy/year absorbed does for Cobalt 60 irraditator
 num_time_steps = len(t)
+H_partial_pressure_interface = data['H_partial_pressure_interface'] # Pa
 cylinder_total_mass_steel = data['cylinder_total_mass_steel']
 cylinder_total_mass_gas = data['cylinder_total_mass_gas']
 circle_concentration = data['circle_concentration']
@@ -28,8 +29,10 @@ SRNL_absorbed_dose = SRNL_data['Dose (MGy)']
 # SRNL_time_data = 365.25/65.21904*SRNL_absorbed_dose
 SRNL_total_mass_gas = 2 * SRNL_data['Cum. H2 yield (μmol)']
 # test = np.argwhere(np.isclose(SRNL_time_data,t))
-# print(test)
 
+# Pressure in kPa accounting for percentage change
+SRNL_partial_pressure = SRNL_data["Gas pressure (kPa)"]*SRNL_data["H2 gas fraction (%)"]/100
+# print(SRNL_partial_pressure)
 
 def numerical_solution_on_experiment_input(experiment_input, tmap_input, tmap_output): # Linear Mapping of simulation data to experimental data
     """Get new numerical solution based on the experimental input data points
@@ -49,6 +52,21 @@ def numerical_solution_on_experiment_input(experiment_input, tmap_input, tmap_ou
         new_tmap_output[i] = (experiment_input[i] - tmap_input[left_limit]) / (tmap_input[right_limit] - tmap_input[left_limit]) * (tmap_output[right_limit] - tmap_output[left_limit]) + tmap_output[left_limit]
     return new_tmap_output
 
+# Plot SRNL Partial Pressure measurements
+plt.figure(figsize=(10, 6))
+plt.plot(SRNL_absorbed_dose,SRNL_partial_pressure, 'ro', label = 'Experimental Data')
+plt.plot(absorbed_dose,H_partial_pressure_interface*1e-3, label = 'Full Simulation')
+plt.plot(absorbed_dose,0.3768*t**0.6177, label = 'Steel-only Simulation (SRNL data fit)')
+# plt.vlines(absorbed_dose[num_time_steps-1],1.65474,16.5474, label = 'Pressure Range for Steel-only Model')
+plt.ylabel(r'H_2 Partial Pressure (kPa)')
+plt.xlabel('Absorbed Dose (MGy)')
+plt.title(f'SRNL Partial Pressure vs. Simulated Partial Pressure at Interface ')
+plt.xlim(0)
+plt.legend()
+plt.ylim(0)
+plt.grid(True)
+plt.tight_layout()
+plt.show()
 
 # Total Hydrogen in the Gas compared to experimental data
 
