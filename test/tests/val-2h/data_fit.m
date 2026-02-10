@@ -3,12 +3,16 @@ clear
 close all
 T = readtable("SRNL_data.csv")
 Dose = [T.Dose_MGy_]
-Time = [Dose*365.25/65.21904] % Convert from dose to days assuming 124 Gy/min dosing
+Time = [Dose*1e6/(1440*124)] % Convert from dose to days assuming 124 Gy/min dosing
 H2_yield = [T.Cum_H2Yield__mol_]
-Partial_pressure = [T.GasPressure_kPa_].*[T.H2GasFraction___]/100
+gas_pressure = T.GasPressure_kPa_ * 1e3 %Pa
+avg_pressure_difference = mean(diff(gas_pressure))
+Partial_pressure = [gas_pressure].*[T.H2GasFraction___]/100
+Partial_pressure_corrected = [gas_pressure - avg_pressure_difference].*[T.H2GasFraction___]/100
+plot(Dose,Partial_pressure_corrected-Partial_pressure)
+
 
 %%
-
 figure
 f1 = fit(Time,H2_yield,"poly1")
 plot(f1,'b-',Time,H2_yield,'ro')
