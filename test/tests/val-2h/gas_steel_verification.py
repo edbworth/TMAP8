@@ -1,14 +1,13 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import glob
 
 # Load CSV data
 data_steel_only = pd.read_csv('csv_data_steel_only/verification_RZ.csv') # CHANGE BELOW TOO
 data = pd.read_csv('csv_data/verification_RZ.csv')
 SRNL_data = pd.read_csv('SRNL_data.csv')
 
-interface_location = 35.941 # mm
+# interface_location = 35.941 # mm
 
 # Pull necessary columns
 t = data['time']
@@ -26,16 +25,14 @@ cylinder_time_integrated_generation = data['cylinder_time_integrated_generation'
 
 # SRNL data for validation
 SRNL_absorbed_dose = SRNL_data['Dose (MGy)']
-# SRNL_time_data = 365.25/65.21904*SRNL_absorbed_dose
 SRNL_total_mass_gas = 2 * SRNL_data['Cum. H2 yield (μmol)'] # atomic H
-# test = np.argwhere(np.isclose(SRNL_time_data,t))
 
 # Pressure in Pa accounting for percentage change
 SRNL_partial_pressure = 1e3* SRNL_data["Gas pressure (kPa)"]*SRNL_data["H2 gas fraction (%)"]/100
-# print(SRNL_partial_pressure)
 
 # Steel-only model data for comparison
 steel_only_cylinder_total_mass_steel = data_steel_only['3d_mass_in_domain']
+# t_steel = data_steel_only['time']
 
 def numerical_solution_on_experiment_input(experiment_input, tmap_input, tmap_output): # Linear Mapping of simulation data to experimental data
     """Get new numerical solution based on the experimental input data points
@@ -60,8 +57,6 @@ plt.figure(figsize=(10, 6))
 plt.plot(SRNL_absorbed_dose,SRNL_partial_pressure, 'ro', label = 'Experimental Data')
 plt.plot(absorbed_dose,H_partial_pressure_interface, label = 'Full Simulation')
 mapped_pressure = numerical_solution_on_experiment_input(SRNL_absorbed_dose, absorbed_dose, H_partial_pressure_interface)
-# plt.plot(absorbed_dose,0.3768*t**0.6177, label = 'Steel-only Simulation (SRNL data fit)')
-# plt.vlines(absorbed_dose[num_time_steps-1],1.65474,16.5474, label = 'Pressure Range for Steel-only Model')
 RMSE = np.sqrt(np.mean((mapped_pressure - SRNL_partial_pressure)**2))
 RMSPE = RMSE*100/np.mean(SRNL_partial_pressure)
 print(f'RMSPE = %.2f '%RMSPE+'%')
@@ -117,51 +112,25 @@ plt.show()
 # Yield and percentage of hydrogen in the steel
 fig, ax1 = plt.subplots(figsize=(10, 6))
 
-# Plot the first Y-axis data
-ax1.plot(t, cylinder_total_mass_steel)
-ax1.set_ylabel(r'Atomic H Total Mass ($\mu$mol)')
+# Plot the first Y-axis data (absolute mass)
+ax1.plot(t, cylinder_total_mass_steel, 'b-', label='H Mass in Steel')
+ax1.set_ylabel(r'Atomic H Total Mass ($\mu$mol)', color='b')
 ax1.set_xlabel('Time (days)')
 ax1.set_title(f'Atomic Hydrogen in Steel of Cylinder vs Time')
 ax1.set_xlim(0)
 ax1.set_ylim(0)
+ax1.tick_params(axis='y', labelcolor='b')
 ax1.grid(True)
 
-# Create a second Y-axis
+# Create a second Y-axis and plot percentage
 ax2 = ax1.twinx()
-# Plot the second Y-axis data (if you have any)
-# ax2.plot(t, some_other_data, color='r')
-ax2.set_ylabel('% Total Hydrogen in Steel ')
-# Scale the second Y-axis data (if you have a scaling factor)
-scaling_factor = 100/cylinder_total_mass  # Example scaling factor
-ax2.set_ylim(ax1.get_ylim()[0] * scaling_factor[0], ax1.get_ylim()[1] * scaling_factor[num_time_steps-1])
+percentage_in_steel = cylinder_total_mass_steel / cylinder_total_mass * 100
+ax2.plot(t, percentage_in_steel, 'r--', alpha=0.7, label='% in Steel')
+ax2.set_ylabel('% Total Hydrogen in Steel', color='r')
+ax2.tick_params(axis='y', labelcolor='r')
+ax2.set_ylim(0, percentage_in_steel.max() * 1.1)  # Add 10% headroom
 plt.tight_layout()
 plt.show()
-
-# # Total Hydrogen in the Steel
-
-# plt.figure(figsize=(10, 6))
-# plt.plot(t,cylinder_total_mass_steel)
-# plt.ylabel(r'Atomic H Total Mass ($\mu$mol)')
-# plt.xlabel('Time (days)')
-# plt.title(f'Hydrogen in Steel of Cylinder vs Time')
-# plt.xlim(0)
-# plt.ylim(0)
-# plt.grid(True)
-# plt.tight_layout()
-# plt.show()
-
-# # Percentage of Hydrogen in steel vs hydrogen in canister
-# plt.figure(figsize=(10, 6))
-# # plt.plot(t,100*annulus_total_mass/initial_canister_concentration) # Total mass vs concentration?? Units off
-# plt.plot(t,100*cylinder_total_mass_steel/cylinder_total_mass)
-# plt.ylabel('Percentage (Atomic H) %')
-# plt.xlabel('Time (days)')
-# plt.title(f'Percentage of Total Hydrogen in Steel')
-# plt.xlim(0)
-# # plt.ylim(0)
-# plt.grid(True)
-# plt.tight_layout()
-# plt.show()
 
 # Measure and Plot Conservation of Mass in 2D (for axisymmetric coordinates)
 plt.figure(figsize=(10, 6))

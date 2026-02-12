@@ -1,18 +1,18 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import glob
+# import glob
 
 # Load CSV data
 # data = pd.read_csv('csv_data_steel_only/verification.csv') # CHANGE BELOW TOO
 data = pd.read_csv('csv_data_steel_only/verification_RZ.csv')
-parameter_study_data = pd.read_csv('peak_pressures.csv')
+# parameter_study_data = pd.read_csv('peak_pressures.csv')
 
-interface_location = 35.941 # mm
+# interface_location = 35.941 # mm
 
 # Pull necessary columns
 t = data['time']
-absorbed_dose = t*65.21904/365.25 #124.7 Gy/min absorbed dose for Cobalt 60 irraditator
+# absorbed_dose = t*65.21904/365.25 #124.7 Gy/min absorbed dose for Cobalt 60 irraditator
 num_time_steps = len(t)
 ring_flux = data['time_integrated_flux']
 ring_concentration = data['mass_in_domain']
@@ -20,41 +20,13 @@ annulus_total_mass = data['3d_mass_in_domain']
 annulus_flux = data['3d_time_integrated_flux']
 exact_diffusion_length = data['exact_diffusion_length']
 simulated_diffusion_length = data['simulated_diffusion_length']
-# analytic_concentration = data['exact_3d_mass_in_domain']
-# initial_canister_concentration = 2*data['initial_canister_concentration'] # Count Atomic Hydrogen
 assumed_gas_total_mass = 2*data['assumed_gas_total_mass'] # Count Atomic Hydrogen
+# print(assumed_gas_total_mass[0])
 
-# # Pressure Paramter Study
-# pressure = parameter_study_data['pressure']
-# yields = parameter_study_data['yield']
-
-# # Pressure Parameter Study
-# plt.figure(figsize=(10, 6))
-# plt.plot(pressure,yields,'ro')
-# plt.ylabel(r'H Total Mass ($\mu$mol)')
-# plt.xlabel('Pressure (psi)')
-# plt.title(f'Atomic Hydrogen in Steel over 1-10% Hydrogen Content in 24 psi He Backfill')
-# plt.xlim(0)
-# plt.ylim(0)
-# plt.grid(True)
-# plt.tight_layout()
-# plt.show()
-
-# plt.figure(figsize=(10, 6))
-# plt.plot(pressure,yields/assumed_gas_total_mass[0]*100)
-# plt.ylabel('Percentage (%)')
-# plt.xlabel('Pressure (psi)')
-# plt.title(f'Atomic Hydrogen in Steel over 1-10% Hydrogen Content in 24 psi He Backfill')
-# plt.xlim(0)
-# plt.ylim(0)
-# plt.grid(True)
-# plt.tight_layout()
-# plt.show()
-
-# Time plot
+# Total Mass and Percentage in Steel
 fig, ax1 = plt.subplots(figsize=(10, 6))
 
-# Plot the first Y-axis data
+# Plot the total mass data
 ax1.plot(t, annulus_total_mass)
 ax1.set_ylabel(r'H Total Mass ($\mu$mol)')
 ax1.set_xlabel('Time (days)')
@@ -63,29 +35,13 @@ ax1.set_xlim(0)
 ax1.set_ylim(0)
 ax1.grid(True)
 
-# Create a second Y-axis
+# Plot Percentage data for assumed mass in gas-phase
 ax2 = ax1.twinx()
-# Plot the second Y-axis data (if you have any)
-# ax2.plot(t, some_other_data, color='r')
 ax2.set_ylabel('% Total Hydrogen (Assuming Ideal Gas)', color='k')
-# Scale the second Y-axis data (if you have a scaling factor)
-scaling_factor = 100/assumed_gas_total_mass  # Example scaling factor
-ax2.set_ylim(ax1.get_ylim()[0] * scaling_factor[0], ax1.get_ylim()[1] * scaling_factor[num_time_steps-1])
+scaling_factor = 100/assumed_gas_total_mass[0]  # Construct percentage
+ax2.set_ylim(ax1.get_ylim()[0] * scaling_factor, ax1.get_ylim()[1] * scaling_factor)
 plt.tight_layout()
 plt.show()
-
-# # Percentage of Hydrogen in steel vs hydrogen in canister
-# plt.figure(figsize=(10, 6))
-# # plt.plot(t,100*annulus_total_mass/initial_canister_concentration) # Total mass vs concentration?? Units off
-# plt.plot(t,100*annulus_total_mass/assumed_gas_total_mass)
-# plt.ylabel('Percentage %')
-# plt.xlabel('Time (days)')
-# plt.title(f'Percentage of Total Hydrogen in Steel (Estimated Generation from Ideal Gas Law)')
-# plt.xlim(0)
-# plt.ylim(0)
-# plt.grid(True)
-# plt.tight_layout()
-# plt.show()
 
 # Check length of diffusion front
 plt.figure(figsize=(10, 6))
@@ -109,8 +65,6 @@ plt.show()
 
 plt.figure(figsize=(10, 6))
 plt.plot(t,abs(exact_diffusion_length - simulated_diffusion_length))
-plt.text(80,0.005, 'RMSPE = %.2f '%RMSPE+'%',fontweight='bold')
-plt.legend()
 plt.ylabel('Difference in Length (mm)')
 plt.xlabel('Time (days)')
 plt.title(f'Hydrogen Canister Simulation: 1D Diffusion Front Length Difference')
@@ -178,5 +132,42 @@ plt.grid(True)
 plt.tight_layout()
 plt.show()
 
+# # Pressure Paramter Study
+# pressure = parameter_study_data['pressure']
+# yields = parameter_study_data['yield']
 
+# # Pressure Parameter Study
+# plt.figure(figsize=(10, 6))
+# plt.plot(pressure,yields,'ro')
+# plt.ylabel(r'H Total Mass ($\mu$mol)')
+# plt.xlabel('Pressure (psi)')
+# plt.title(f'Atomic Hydrogen in Steel over 1-10% Hydrogen Content in 24 psi He Backfill')
+# plt.xlim(0)
+# plt.ylim(0)
+# plt.grid(True)
+# plt.tight_layout()
+# plt.show()
 
+# plt.figure(figsize=(10, 6))
+# plt.plot(pressure,yields/assumed_gas_total_mass[0]*100)
+# plt.ylabel('Percentage (%)')
+# plt.xlabel('Pressure (psi)')
+# plt.title(f'Atomic Hydrogen in Steel over 1-10% Hydrogen Content in 24 psi He Backfill')
+# plt.xlim(0)
+# plt.ylim(0)
+# plt.grid(True)
+# plt.tight_layout()
+# plt.show()
+
+# # Percentage of Hydrogen in steel vs hydrogen in canister
+# plt.figure(figsize=(10, 6))
+# # plt.plot(t,100*annulus_total_mass/initial_canister_concentration) # Total mass vs concentration?? Units off
+# plt.plot(t,100*annulus_total_mass/assumed_gas_total_mass)
+# plt.ylabel('Percentage %')
+# plt.xlabel('Time (days)')
+# plt.title(f'Percentage of Total Hydrogen in Steel (Estimated Generation from Ideal Gas Law)')
+# plt.xlim(0)
+# plt.ylim(0)
+# plt.grid(True)
+# plt.tight_layout()
+# plt.show()

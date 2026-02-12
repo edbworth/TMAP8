@@ -11,8 +11,8 @@ gas_volume = '${units ${fparse pi*inner_radius^2*height} mm^3}'
 
 # Ambient Physical & Chemical Parameters
 temperature = '${units 313.15 K}' # mild temp
-# initial_pressure_air = '${units 0.051 Pa}' # Hydrogen in atmosphere is negligible?
-initial_pressure_air = '${units 0 psi -> Pa}'
+initial_pressure_air = '${units 0.051 Pa}' # Hydrogen in atmosphere is negligible?
+# initial_pressure_air = '${units 0 psi -> Pa}'
 # estimated_pressure_gas = '${units ${fparse 24*0.10} psi -> Pa}' # Anywhere from 1-10% of 24 psi
 ideal_gas_constant = '${units 8.31446261815324 J/K/mol -> J/K/mumol}' # Not input directly into BC or interface
 
@@ -52,7 +52,7 @@ dt_start = '${units 300 s -> day}' # nonlinear source functions need smaller tim
 
 [Mesh]
 
-  coord_type = 'RZ' # Specify 2D axisymmetric coordinates. My hunch is that the boundary integrals applied do not cover the top and bottom of a cylinder.
+  coord_type = 'RZ' # Specify 2D axisymmetric coordinates.
   rz_coord_axis = Y # Specifies X is radial direction and Y is axial coordinate
 
   [total_length]
@@ -80,11 +80,11 @@ dt_start = '${units 300 s -> day}' # nonlinear source functions need smaller tim
 []
 
 [Variables]
-  [H_mobile_gas]
+  [H_mobile_gas] # Molecular mobile H_2 gas inside canister
     block = '0'
     initial_condition = '${initial_concentration_gas}'
   []
-  [H_mobile_steel]
+  [H_mobile_steel] # Atomic mobile H within steel
     block = '1'
     initial_condition = '${initial_concentration_steel}'
   []
@@ -143,7 +143,9 @@ dt_start = '${units 300 s -> day}' # nonlinear source functions need smaller tim
     boundary = interface_steel_to_gas
     diffusivity = '${diffusivity_H_in_steel}'
     unit_scale = 1 # correction factor to go from atomic hydrogen to molecular for C_s
-    unit_scale_neighbor = 1e3 # Correction factor for C_g
+    unit_scale_neighbor = 1e3 # Unit corrections for u_s*C_s = K*\sqrt{u_{sn}*C_g*R*T}
+    # unit_scale_neighbor = '${fparse ideal_gas_constant * temperature * 1e9}' # Converts C_gas [mumol/mm^3] to P [Pa]: R*T*1e9 = 2.604e6 FROM CLAUDE
+    # sorption_penalty = 1e3 # Why do you exist???
   []
 []
 
@@ -248,7 +250,7 @@ dt_start = '${units 300 s -> day}' # nonlinear source functions need smaller tim
     type = ScalePostprocessor
     value = circle_concentration_steel
     scaling_factor = '${height}'
-    # outputs = csv_data
+    outputs = csv_data
   []
 
   [cylinder_total_mass_gas]
@@ -270,7 +272,6 @@ dt_start = '${units 300 s -> day}' # nonlinear source functions need smaller tim
   [circle_generation_molecular] # Integral of Source function on circlular cross section giving units of mumol/mm/day
     type = FunctionElementIntegral
     function = gas_generation_rhs_fun
-    # function = unity
     block = '0'
     outputs = csv_data
   []
@@ -297,7 +298,7 @@ dt_start = '${units 300 s -> day}' # nonlinear source functions need smaller tim
 
   # Flux Calculations
 
-  [circle_influx] # Influx at the center of canister measured on a single point in RZ coordinates, so this is a integral on a 1D domain. I suspect this value is the same regardless of cartesian or RZ
+  [circle_influx] # Influx at the center of canister should be zero
     type = ADSideDiffusiveFluxIntegral
     boundary = '0'
     variable = H_mobile_gas
@@ -305,7 +306,7 @@ dt_start = '${units 300 s -> day}' # nonlinear source functions need smaller tim
     outputs = csv_data
   []
 
-  [circle_outflux] # outflux on edges of cylinder.
+  [circle_outflux] # outflux on outside edges of steel.
     type = ADSideDiffusiveFluxIntegral
     boundary = '1'
     variable = H_mobile_steel
@@ -315,7 +316,7 @@ dt_start = '${units 300 s -> day}' # nonlinear source functions need smaller tim
 
   [circle_flux_difference]
     type = ParsedPostprocessor
-    expression = 'circle_outflux - 2*circle_influx' # No source term and zero Initial condition
+    expression = 'circle_outflux - 2*circle_influx' # Account for atomic hydrogen
     pp_names = 'circle_influx circle_outflux'
     outputs = csv_data
   []
@@ -335,20 +336,12 @@ dt_start = '${units 300 s -> day}' # nonlinear source functions need smaller tim
 
   ### Miscellaneous ###
 
-  [min_gas] # Rough Check for Negative Concentrations
-  type = ADElementExtremeFunctorValue
-  functor = H_mobile_gas
-  value_type = min
-  outputs = csv_data
-  block = '0'
-  []
-
   [min_steel] # Rough Check for Negative Concentrations
-  type = ADElementExtremeFunctorValue
-  functor = H_mobile_steel
-  value_type = min
-  # outputs = csv_data
-  block = '1'
+    type = ADElementExtremeFunctorValue
+    functor = H_mobile_steel
+    value_type = min
+    outputs = csv_data
+    block = '1'
   []
 
   [H_partial_pressure_interface]
@@ -390,16 +383,20 @@ dt_start = '${units 300 s -> day}' # nonlinear source functions need smaller tim
   # nl_abs_tol = 1e-50
   # nl_rel_tol = 1e-08
   # nl_abs_tol = 1e-20
-  nl_rel_tol = 1e-06
+  # nl_rel_tol = 1e-07
   end_time = ${endtime}
   [TimeSteppers]
-    [Adaptive]
-      type = IterationAdaptiveDT
-      dt = ${dt_start}
-      optimal_iterations = 5
-      growth_factor = 1.1
-      cutback_factor_at_failure = .9
+    [Match] # Take same number of timesteps as steel_only model
+      type = ExodusTimeSequenceStepper
+      mesh = steel_only_out.e
     []
+    # [Adaptive]
+    #   type = IterationAdaptiveDT
+    #   dt = ${dt_start}
+    #   optimal_iterations = 5
+    #   growth_factor = 1.1
+    #   cutback_factor_at_failure = .9
+    # []
   []
 []
 

@@ -17,8 +17,8 @@ initial_pressure_air = '${units 0.051 Pa}' # Hydrogen in atmosphere is negligibl
 ideal_gas_constant = '${units 8.31446261815324 J/K/mol -> J/K/mumol}'
 
 # Initial Concentrations
-initial_concentration_steel = '${units ${fparse initial_pressure_air/(ideal_gas_constant*temperature)} mumol/m^3 -> mumol/mm^3}'
-# initial_concentration_steel = '${units 0 mumol/mm^3}'
+# initial_concentration_steel = '${units ${fparse initial_pressure_air/(ideal_gas_constant*temperature)} mumol/m^3 -> mumol/mm^3}'
+initial_concentration_steel = '${units 0 mumol/mm^3}'
 
 ### STEEL-ONLY MODEL MUST ASSUME TOTAL CONCENTRATION IN GAS ###
 # assumed_gas_total_mass = '${units 1466.5 mumol}' # molecular hydrogen peak from SRNL data
@@ -39,7 +39,7 @@ solubility_activation_energy_in_steel = '${units 6.86 kJ/mol -> J/mol}' # Leave 
 num_intervals_steel = 5000
 
 # Numerics
-dt_max = '${units 7 day -> day}'
+dt_max = '${units 7 day}'
 dt_min = '${units 1 s -> day}'
 # endtime = '${units 1 year -> day}'
 endtime = '${units 0.25 year -> day}'
@@ -66,13 +66,13 @@ dt_start = '${units 300 s -> day}' # 3 hours does not give negative concentratio
 [AuxVariables]
   [H_partial_pressure_gas]
     initial_condition = 0 # Pressured ramped in time or data fit to SRNL data, both of which have starting value of 0
-    # order = FIRST
-    # family = LAGRANGE
+    order = FIRST
+    family = LAGRANGE
   []
   [H_partial_pressure_air]
     initial_condition = '${initial_pressure_air}'
-    # order = FIRST
-    # family = SCALAR
+    order = FIRST
+    family = SCALAR
     outputs = none
   []
   [H_mobile_steel_derivative]
@@ -157,8 +157,8 @@ dt_start = '${units 300 s -> day}' # 3 hours does not give negative concentratio
   [SRNL_pressure_data_fun]
     type = ParsedFunction
     # expression = '1e3*0.3768*t^0.6177' # Fit in kPa and multiplied to Pa (Need to refit for corrected pressure)
-    # expression = '376.7588*t^0.6177' # Pa
-    expression = '381.1436*t^0.6209' # Pa with average correction
+    expression = '376.7588*t^0.6177' # Pa
+    # expression = '381.1436*t^0.6209' # Pa with average correction
   []
   [diffusion_length_fun]
     type = ParsedFunction
@@ -318,7 +318,7 @@ dt_start = '${units 300 s -> day}' # 3 hours does not give negative concentratio
 
 [Outputs]
   # print_linear_residuals = true
-  # exodus = true
+  exodus = true
   [csv_data]
     type = CSV
     file_base = 'csv_data_steel_only/verification_RZ'
