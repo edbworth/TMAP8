@@ -2,7 +2,7 @@
 
 &nbsp;
 
-!media figures/TMAP8_logo/TMAP8_vertical_blue.png dark_src=figures/TMAP8_logo/TMAP8_vertical_white.png style=display:block;margin-left:auto;margin-right:auto;width:30%;
+!media figures/TMAP8_logo/TMAP8_vertical_blue.png dark_src=figures/TMAP8_logo/TMAP8_vertical_white.png alt=TMAP8 logo style=display:block;margin-left:auto;margin-right:auto;width:30%;
 
 # Tritium Migration Analysis Program, Version 8 class=center style=font-weight:200;font-size:200%
 
@@ -40,6 +40,21 @@ verification of TMAP8. These V&V cases can be found here.
 !col-end!
 !row-end!
 
+## TMAP8 Wins 2026 R&D 100 Award
+
+!media figures/RD100_2026_Winner_Logo_scaled.png alt=2026 R&D 100 Award Winner logo style=display:block;margin-left:auto;margin-right:auto;width:18%;
+
+!style halign=center
+TMAP8 was named among the winners of the 2026 R&D 100 Award. See the other
+[R&D 100 Award Winners](https://www.rdworldonline.com/presenting-the-2026-rd-100-awards-winners/).
+
+!style halign=center
+The R&D 100 awards began in 1963 as a science and technology
+competition recognizing 100 of the most technologically significant new products,
+technologies, and materials introduced into the marketplace each year. TMAP8 is the first open-source platform for tritium modeling to meet the Nuclear 
+Quality Assurance Level 1 (NQA-1) industry standard. It also combines multiscale and multiphysics simulation capabilities with broad industry accessibility
+and applicability to accelerate the development of commercially viable fusion systems. 
+
 ## TMAP8 is built on MOOSE style=clear:both;
 
 !style halign=left
@@ -48,7 +63,7 @@ that permits the solution of coupled physics problems of varying size and dimens
 These can be solved using computer hardware appropriate for the model size, ranging from
 laptops and workstations to large high performance computers.
 
-!media large_media/framework/inl_blue.png style=float:right;width:20%;margin-left:30px;
+!media large_media/framework/inl_blue.png alt=Idaho National Laboratory logo style=float:right;width:20%;margin-left:30px;
 
 Code reliability is a central principle in code development, and this project
 employs a well-defined development and testing strategy.  Code changes are only
