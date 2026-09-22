@@ -21,12 +21,11 @@ import pandas as pd
 
 # File paths
 SCRIPT_DIR = Path(__file__).resolve().parent
-GOLD_DIR = SCRIPT_DIR / "gold"
-MOBILE_DIR = GOLD_DIR / "deuterium_mobile_concentration_profile"
-TRAPPED_DIR = GOLD_DIR / "deuterium_trapped_concentration_profile"
+MOBILE_DIR = SCRIPT_DIR / "deuterium_mobile_concentration_profile"
+TRAPPED_DIR = SCRIPT_DIR / "deuterium_trapped_concentration_profile"
 MOBILE_COL = "mobile"
 TRAPPED_COL = "trapped_1"
-MAIN_CSV = GOLD_DIR / "val-2l_out.csv"
+MAIN_CSV = SCRIPT_DIR / "val-2l_out.csv"
 OUTPUT_FILE = SCRIPT_DIR / "val-2l_profile_animation.gif"
 
 # Animation settings

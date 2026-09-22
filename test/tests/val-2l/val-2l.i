@@ -137,7 +137,6 @@
     functor_names = 'temperature_function'
     functor_symbols = 'temperature'
     expression = '${diffusivity_preexponential_factor} * exp(- ${diffusivity_activation_energy} / ${kb_eV} / temperature)'
-    output_properties = 'diffusivity_mat'
   []
 
   [recombination_rate_surface]

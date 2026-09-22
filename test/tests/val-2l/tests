@@ -10,6 +10,7 @@
   []
   [val-2l_comparison]
     type = RunCommand
+    prereq = val-2l_csvdiff
     command = 'python3 comparison_val-2l.py'
     requirement = 'The system shall be able to generate comparison plots between the analytical solution and simulated solution of validation case 2l'
     required_python_packages = 'matplotlib numpy pandas'
