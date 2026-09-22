@@ -6,7 +6,7 @@
 This validation case is based on the thermal desorption spectroscopy (TDS) experiments and TMAP7 analysis reported by [!cite](Shimada2011). The experiments compared deuterium release from unirradiated tungsten (0 dpa) and neutron-irradiated tungsten (0.025 dpa) after high-flux deuterium-plasma exposure.
 
 !alert note title=Scope of the current validation
-The present implementation addresses only the unirradiated sample and benchmarks the TMAP8 result against TMAP7 fit A in Figure 3 of [!cite](Shimada2011). It does not yet validate the neutron-irradiated case. A future extension will add the trap populations required to model the irradiated sample.
+The present implementation addresses only the unirradiated sample and benchmarks the TMAP8 result against TMAP7 fit A in Figure 3 of [!cite](Shimada2011). It does not yet validate the neutron-irradiated case. A future extension will enhance the model to capture the behavior of the irradiated sample.
 
 For the unirradiated sample, [!cite](Shimada2011) reported a narrow release spectrum between approximately 450 K and 700 K. Their TMAP7 Fit A validated against this spectra assuming a uniform concentration of 4 at.% 1.35 eV traps to a depth of 0.7 $\mu$m.
 
@@ -16,11 +16,10 @@ The objectives of this first stage of `val-2l` are to:
 2. Compare the TMAP8 desorption flux with the digitized experimental TDS data;
 3. Verify that the deuterium inventory and integrated surface release satisfy mass conservation;
 4. Establish a model that can later be extended to the neutron-irradiated sample; and
-5. Perform PSS optimization on that model characterize uncertainty in the chosen material properties in the simulations in [!cite](Shimada2011).
 
 ## Experimental Description
 
-The tungsten specimens were 6 mm-diameter, 0.2 mm-thick discs made from 99.99 at.% polycrystalline tungsten. Both the unirradiated and irradiated specimens were exposed to 100 eV deuterons at a nominal flux of $5\times10^{21}$ m$^{-2}$ s$^{-1}$ and a fluence of $4\times10^{25}$ m$^{-2}$ while the specimen temperature was maintained at 473 K [!cite](Shimada2011). After exposure, deuterium release was measured using TDS.
+The tungsten specimens were 6 mm-diameter, 0.2 mm-thick discs made from 99.99 at.% polycrystalline tungsten. Both the unirradiated and irradiated specimens were exposed to 100 eV deuterons at a nominal flux of $5\times10^{21}$ m$^{-2}$ s$^{-1}$ and a fluence of $4\times10^{25}$ m$^{-2}$ while the specimen temperature was maintained at 473 K [!citep](Shimada2011). After exposure, deuterium release was measured using TDS.
 
 The measured temperature history is prescribed directly in the TMAP8 model rather than approximated by a constant heating rate. It is imperative that we capture the correct temperature history, as sharp TDS spectra coincide with temperature fluctuations between roughly 100-150 seconds and 200-250 seconds for the neutron-irradiated sample. The digitized version of this temperature history is found in [val-2l_temperature_history].
 
@@ -28,7 +27,7 @@ The measured temperature history is prescribed directly in the TMAP8 model rathe
     image_name=val-2l_temperature_history.png
     id=val-2l_temperature_history
     style=width:50%;margin-bottom:2%;margin-left:auto;margin-right:auto
-    caption=Temperature history prescribed during the TDS simulation. The inset highlights the early-time temperature fluctuations reported during the experiment.
+    caption=Temperature history prescribed during the TDS simulation. The inset highlights the early-time temperature fluctuations reported during the experiment in [!cite](Shimada2011).
 
 ## Model Description
 
@@ -43,7 +42,7 @@ The physical mobile-species balance is
 !equation id=val-2l_mobile_balance
 \frac{\partial C_M}{\partial t} - \nabla \cdot \left(D(T) \nabla C_M\right) + \sum_{i=1}^{N_{trap}}f_{T/M_i}\frac{\partial C_{T_i}}{\partial t} = 0,
 
-where $C_M$ and $C_{T_i}$ are the concentration of the mobile and trapped species, respectively, $t$ is the time, $D(T)$ is the temperature-dependent diffusivity of deuterium in tungsten, N_{trap} is the number of traps, and $f_{T/M}$ is a user-defined numerical scaling factor for better numerical convergence. The deuterium diffusivity follows the Frauenfelder [!cite](frauenfelder1969solution) relation corrected for deuterium and reported by [!cite](Causey2002):
+where $C_M$ and $C_{T_i}$ are the concentration of the mobile and trapped species, respectively, $t$ is the time, $D(T)$ is the temperature-dependent diffusivity of deuterium in tungsten, N_{trap} is the number of traps, and $f_{T/M_i}$ is a user-defined numerical scaling factor for better numerical convergence. The deuterium diffusivity follows the Frauenfelder [!citep](frauenfelder1969solution) relation corrected for deuterium and reported by [!cite](Causey2002):
 
 !equation id=val-2l_diffusivity
 D(T)=D_0\exp\left(-\frac{E_D}{k_B T}\right).
@@ -98,20 +97,11 @@ The physical parameters currently used for the unirradiated Fit A benchmark are 
 | $\alpha_{t,0}$ | Trapping prefactor | $9.1316\times10^{12}$ | s$^{-1}$ | [!cite](ambrosek2008verification) |
 | $\alpha_{r,0}$ | Release prefactor | $8.4\times10^{12}$ | s$^{-1}$ | [!cite](ambrosek2008verification) |
 
-The concentration variables are rescaled internally by a factor of $10^4$ to improve nonlinear convergence. This scaling does not change the physical trap concentration reported above.
+The concentration variables are rescaled internally by a factor of $f_{T/M}=10^4$ to improve nonlinear convergence. This scaling does not change the physical trap concentration reported above.
 
 
 ## Results
 
-### Temperature-dependent diffusivity
-
-[val-2l_diffusivity_plot] confirms that the TMAP8 material follows the prescribed Arrhenius relationship over the experimental temperature range.
-
-!media comparison_val-2l.py
-    image_name=val-2l_diffusivity_vs_temperature.png
-    style=width:50%;margin-bottom:2%;margin-left:auto;margin-right:auto
-    id=val-2l_diffusivity_plot
-    caption=Deuterium diffusivity in tungsten evaluated from the TMAP8 material model as a function of reciprocal temperature.
 
 ### Unirradiated desorption benchmark
 
@@ -123,7 +113,7 @@ The concentration variables are rescaled internally by a factor of $10^4$ to imp
     style=width:50%;margin-bottom:2%;margin-left:auto;margin-right:auto
     caption=Comparison of the TMAP8 prediction using the TMAP7 Fit A parameters with the unirradiated experimental TDS data reported by [!cite](Shimada2011).
 
-The current comparison script calculates the mean-normalized root-mean-squared-percentage error,
+The current comparison script calculates the mean-normalized root-mean-squared-percentage error (RMSPE),
 
 !equation id=val-2l_error_metric
 \mathrm{RMSPE} = \frac{\sqrt{\sum_{i=1}^{n}\left(J_{\mathrm{TMAP8},i}-J_{\mathrm{exp},i}\right)^2/n}}{\sum_{i=1}^{n}J_{\mathrm{exp}}/n}\times100
@@ -148,15 +138,12 @@ The mass-balance residual is computed from the change in retained deuterium plus
 
 ## Discussion and Limitations
 
-This stage of `val-2l` is intentionally limited to the unirradiated Fit A case. It exercises temperature-dependent diffusion, trapping and release, finite surface recombination, a measured temperature history, and inventory accounting in TMAP8. The comparison does not establish that the Fit A trap distribution is unique. In [!cite](Shimada2011), Fit A was calibrated to the TDS spectrum alone and did not reproduce the measured NRA depth profile.
+This stage of `val-2l` is intentionally limited to the unirradiated Fit A case. It exercises temperature-dependent diffusion, trapping and release, surface recombination rates, a measured temperature history, and inventory accounting in TMAP8. The comparison does not establish that the Fit A trap distribution is unique. In [!cite](Shimada2011), Fit A was calibrated to the TDS spectrum alone and did not reproduce the measured NRA depth profile.
 
-## PSS Optimization
-
-PSS optimization details will go here.
 
 ### Planned extension to the neutron-irradiated case
 
-The neutron-irradiated specimen (0.025 dpa) exhibited a much broader desorption spectrum than the unirradiated specimen and required multiple trap populations in the TMAP7 analysis [!cite](Shimada2011). A later extension of `val-2l` will:
+The neutron-irradiated specimen (0.025 dpa) exhibited a much broader desorption spectrum than the unirradiated specimen and required multiple trap populations in the TMAP7 analysis [!citep](Shimada2011). A later extension of `val-2l` will:
 
 1. add the irradiated experimental TDS and temperature-history data;
 2. introduce multiple trap populations to attempt to capture multiple sharp spectra;
@@ -168,7 +155,7 @@ The neutron-irradiated specimen (0.025 dpa) exhibited a much broader desorption 
 
 The files used in the current unirradiated benchmark are:
 
-- [test/tests/val-2l/val-2l.params](val-2l.params), which contains the physical and numerical parameters;
-- [test/tests/val-2l/val-2l.i](val-2l.i), which defines the one-dimensional transport, trapping, release, surface recombination, and postprocessing model;
+- [!file](/val-2l.params), which contains the physical and numerical parameters;
+- [!file](/val-2l.i), which defines the one-dimensional transport, trapping, release, surface recombination, and postprocessing model;
 
 !bibtex bibliography
