@@ -176,21 +176,6 @@
     type = ParsedFunction
     expression = 'if(x < ${trap_depth}, ${trap_fraction}, 0.0)'
   []
-
-  # [timestep_limiting_function]
-  #   type = ParsedFunction
-  #   expression = 'min(if(t < 100, dt_max, if(t < 350, dt_fine, dt_max)), if(abs(flux) > flux_threshold, dt_fine, dt_max))'
-  #   symbol_names = 'flux dt_max dt_fine flux_threshold'
-  #   symbol_values = 'deuterium_release_flux_total ${dt_max} ${dt_fine} ${flux_threshold}'
-  # []
-  # [timestep_limiting_function]
-  #   type = ParsedFunction
-  #   expression = 'if(T >= 450 & T <= 750, dt_fine, dt_max)'
-  #   symbol_names  = 'T            dt_fine      dt_max'
-  #   symbol_values = 'temperature_function
-  #                    ${dt_fine}
-  #                    ${dt_max}'
-  # []
 []
 
 [Postprocessors]
@@ -287,11 +272,11 @@
 
   [dt_limit]
     type = ParsedPostprocessor
-    expression = 'min(if(t < 350, dt_fine, dt_max), if(abs(flux) > flux_threshold, dt_fine, dt_max))'
+    expression = 'min(if(t < 350, dt_fine_temp, dt_max), if(abs(flux) > flux_threshold, dt_fine_spectra, dt_max))'
     pp_names = 'deuterium_release_flux_total'
     pp_symbols = 'flux'
-    constant_names = 'dt_max dt_fine flux_threshold'
-    constant_expressions = '${dt_max} ${dt_fine} ${flux_threshold}'
+    constant_names = 'dt_max dt_fine_temp dt_fine_spectra flux_threshold'
+    constant_expressions = '${dt_max} ${dt_fine_temp} ${dt_fine_spectra} ${flux_threshold}'
     use_t = true
     execute_on = 'TIMESTEP_END'
     outputs = csv
