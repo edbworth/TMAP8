@@ -138,7 +138,6 @@
     functor_symbols = 'temperature'
     expression = '${diffusivity_preexponential_factor} * exp(- ${diffusivity_activation_energy} / ${kb_eV} / temperature)'
     output_properties = 'diffusivity_mat'
-    outputs = 'exodus'
   []
 
   [recombination_rate_surface]
@@ -162,8 +161,8 @@
   [temperature_function]
     type = PiecewiseLinear
     data_file = 'gold/temperature_data.csv'
-    x_title = time
-    y_title = temperature
+    x_title = 'time (s)'
+    y_title = 'temperature (K)'
     format = columns
   []
 
@@ -303,14 +302,14 @@
     type = NodalValueSampler
     variable = mobile
     sort_by = x
-    execute_on = 'TIMESTEP_END'
+    execute_on = 'INITIAL TIMESTEP_END'
     outputs = profile_csv
   []
   [trapped_1_profile]
     type = NodalValueSampler
     variable = trapped_1
     sort_by = x
-    execute_on = 'TIMESTEP_END'
+    execute_on = 'INITIAL TIMESTEP_END'
     outputs = trapped_profile_csv
   []
 []
@@ -320,7 +319,6 @@
   csv = true
   perf_graph = true
   sync_times = '100 350'
-  exodus = true
   [profile_csv]
     type = CSV
     file_base = 'deuterium_mobile_concentration_profile/val-2l_out'
@@ -361,22 +359,4 @@
     reject_large_step = true
     reject_large_step_threshold = 0.9
   []
-  # [TimeStepper]
-  #   type = FunctionDT
-  #   function = timestep_limiting_function
-  #   # growth_factor = 2
-  # []
-  # [TimeSteppers]
-  #   [iteration_dt]
-  #     type = IterationAdaptiveDT
-  #     dt = ${dt_start}
-  #     optimal_iterations = 5
-  #     growth_factor = 1.1
-  #     cutback_factor_at_failure = 0.5
-  #   []
-  #   [limiting_dt]
-  #     type = FunctionDT
-  #     function = timestep_limiting_function
-  #   []
-  # []
 []

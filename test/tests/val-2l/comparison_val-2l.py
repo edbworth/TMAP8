@@ -1,24 +1,21 @@
 """
 This is the main comparison script for val-2l, and computes the following plots:
+
 1: plot_timestep_behavior() visualizes the adaptive timestepper based on critical temperature regions and measured fluxes
 1: plot_temperature_history() shows the temperature profile over the entire time of experiment, as well as an inlet graph that zooms in on temperature anomolies observed during the experiment
 2: plot_mass_conservation() shows the evolution of the mass conservation residual relative to the initial mass at the start of the TDS experiment
 3: plot_inventory() shows the deuterium present in traps and as a mobile concentration
-4: plot_diffusivity_vs_temperature() shows the diffusivity as a function of reciprocal temperature, which should be linear
-5: plot_unirradiated_desorption() plots the simulated against experimental desorbed flux from the upstream and downstream surfaces, performing RMSPE calculations to measure the goodness of fit
+4: plot_unirradiated_desorption() plots the simulated against experimental desorbed flux from the upstream and downstream surfaces, performing RMSPE calculations to measure the goodness of fit
 """
 
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib import gridspec
 from matplotlib.patches import Patch
 import pandas as pd
-from scipy import special
-import scipy.stats as stats
 import os
 
 # Changes working directory to script directory (for consistent MooseDocs usage)
-script_folder = os.path.dirname(__file__)
+script_folder = os.path.dirname(os.path.abspath(__file__))
 os.chdir(script_folder)
 
 # Geometry
@@ -100,7 +97,7 @@ def annotate_rmspe(simulated, reference, x_pos, y_pos):
 def plot_timestep_behavior(
     simulation_file="val-2l_out.csv",
     filename="val-2l_timestep_behavior.png",
-    temperature_window=(100.0, 350.0),
+    temperature_window=(0.0, 350.0),
 ):
     """Plot temperature, desorbed flux, and timestep size over time.
 
@@ -114,8 +111,6 @@ def plot_timestep_behavior(
         simulation_file (str): TMAP8 CSV with "time", "dt", "temperature", and
             "desorbed_flux" columns.
         filename (str): Output PNG filename.
-        flux_threshold (float): Flux magnitude above which fine timesteps are used
-            in at/m^2/s.
         temperature_window (tuple[float, float]): Start and end times of the fixed
             fine-timestep interval in seconds.
     """
@@ -397,48 +392,6 @@ def plot_inventory(
     plt.close(fig)
 
 
-def plot_diffusivity_vs_temperature(
-    simulation_file="val-2l_out.csv",
-    filename="val-2l_diffusivity_vs_temperature.png",
-):
-    """Plot the deuterium diffusivity in tungsten against temperature
-
-    The diffusivity is spatially uniform (it depends only on temperature), so the
-    ``diffusivity_pp`` and ``temperature`` postprocessors from the TMAP8 output fully
-    describe D(T) over the simulated TDS ramp. Reading them straight from the CSV
-    keeps the Arrhenius law defined in exactly one place (val-2l.i). It is the
-    Frauenfelder relation corrected for deuterium, Shimada et al. 2010
-    (p. S668, Section 3): D = 2.9e-7 * exp(-0.39 eV / (k_B T)) m^2/s.
-
-    Args:
-        simulation_file (str): TMAP8 CSV with "temperature" (K) and "diffusivity_pp"
-            (µm²/s) columns
-        filename (str): output PNG filename
-    """
-    temperature, diffusivity = read_csv_from_TMAP8(
-        simulation_file, ["temperature", "diffusivity_pp"]
-    )
-    # Drop the INITIAL row (t = 0), where postprocessors are still 0, then sort by T.
-    valid = diffusivity > 0
-    temperature, diffusivity = temperature[valid], diffusivity[valid]
-    order = np.argsort(temperature)
-    temperature, diffusivity = temperature[order], diffusivity[order]
-    diffusivity_m2_s = diffusivity * 1e-12  # µm²/s -> m²/s
-    reciprocal_temperature = 1000.0 / temperature  # 1000/T (1/K)
-
-    fig, ax = plt.subplots(figsize=(8, 5))
-    ax.semilogy(
-        reciprocal_temperature, diffusivity_m2_s, color="steelblue", linewidth=2
-    )
-    ax.set_xlabel(r"Reciprocal temperature 1000/T (K$^{-1}$)")
-    ax.set_ylabel(r"Diffusivity (m$^2$/s)")
-    ax.set_title("Deuterium Diffusivity in Tungsten")
-    ax.grid(True, which="both", linestyle="--", alpha=0.4)
-    plt.tight_layout()
-    plt.savefig(filename, bbox_inches="tight", dpi=300)
-    plt.close(fig)
-
-
 def plot_unirradiated_desorption(
     experiment_file="unirradiated_data.csv",
     simulation_file="val-2l_out.csv",
@@ -448,10 +401,10 @@ def plot_unirradiated_desorption(
     """Plot the Shimada (2010) unirradiated desorption data against TMAP8
 
     The simulated and experimental desorbed fluxes are plotted versus time,
-    with the RMSPE annotated over the region tmin–tmax seconds.
+    with the RMSPE annotated over the region tmin-tmax seconds.
 
     Args:
-        experiment_file (str): two-column, header-less CSV of
+        experiment_file (str): two-column CSV of
             (time [s], desorbed flux [m^-2 s^-1])
         simulation_file (str): TMAP8 CSV output holding "time" and
             the desorbed-flux column
@@ -459,7 +412,7 @@ def plot_unirradiated_desorption(
             simulation_file. TMAP8 reports it in at/µm^2/s; converted to at/m^2/s.
         comparison_plot (str): output PNG filename
     """
-    experiment = np.loadtxt(experiment_file, delimiter=",")
+    experiment = np.loadtxt(experiment_file, skiprows=1, delimiter=",")
     experiment_time, experiment_flux = experiment[:, 0], experiment[:, 1]
 
     simulation_time, simulation_flux = read_csv_from_TMAP8(
@@ -479,23 +432,20 @@ def plot_unirradiated_desorption(
     tmin, tmax = 500, 3000
     rmspe_region = (experiment_time >= tmin) & (experiment_time <= tmax)
 
-    plt.figure(figsize=(10, 6))
-    plt.plot(
-        experiment_time,
-        experiment_flux,
-        "ro",
-        label="Experiment (Shimada 2010, 0 dpa)",
+    fig, ax = plt.subplots(figsize=(10, 6))
+    ax.plot(
+        experiment_time, experiment_flux, "ro", label="Experiment (Shimada 2010, 0 dpa)"
     )
-    plt.plot(simulation_time, simulation_flux, "b-", label="TMAP8")
+    ax.plot(simulation_time, simulation_flux, "b-", label="TMAP8")
     if rmspe_region.any():
-        plt.axvline(
+        ax.axvline(
             experiment_time[rmspe_region].min(),
             color="green",
             linestyle="--",
             linewidth=1.2,
             label="RMSPE region",
         )
-        plt.axvline(
+        ax.axvline(
             experiment_time[rmspe_region].max(),
             color="green",
             linestyle="--",
@@ -504,44 +454,31 @@ def plot_unirradiated_desorption(
         annotate_rmspe(
             mapped_simulation_flux[rmspe_region],
             experiment_flux[rmspe_region],
-            experiment_time[rmspe_region].mean(),
-            experiment_flux.max() / 4,
+            experiment_time.max() / 2,
+            experiment_flux.max() / 2,
         )
-    plt.xlabel("Time (s)")
-    plt.ylabel(r"Desorbed flux (m$^{-2}$s$^{-1}$)")
-    plt.title("Unirradiated Sample: Deuterium Desorption: TMAP8 vs Experiment")
-    plt.xlim(experiment_time.min(), experiment_time.max())
-    plt.ylim(0)
-    plt.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
-    plt.legend()
-    plt.grid(True)
+    ax.set_xlabel("Time (s)")
+    ax.set_ylabel(r"Desorbed flux (m$^{-2}$s$^{-1}$)")
+    ax.set_title("Unirradiated Sample: Deuterium Desorption: TMAP8 vs Experiment")
+    ax.set_xlim(experiment_time.min(), experiment_time.max())
+    ax.set_ylim(bottom=0)
+    ax.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
+    ax.legend()
+    ax.grid(True)
     plt.tight_layout()
     plt.savefig(comparison_plot, bbox_inches="tight", dpi=300)
+    plt.close(fig)
 
 
 # ========================== Plot calls ========================== #
 
-# plot_temperature_history(simulation_file="temperature_data.csv")
 plot_timestep_behavior()
 plot_temperature_history()
 plot_mass_conservation()
 plot_inventory()
-plot_diffusivity_vs_temperature()
+
 if "/tmap8/doc/" in script_folder.lower():  # if in documentation folder
     unirradiated_data_file = "../../../../test/tests/val-2l/gold/unirradiated_data.csv"
 else:  # if in test folder
     unirradiated_data_file = "./gold/unirradiated_data.csv"
-
 plot_unirradiated_desorption(experiment_file=unirradiated_data_file)
-
-data = pd.read_csv("val-2l_out.csv")
-flux_column = "deuterium_release_flux_total"
-
-i_max = data[flux_column].abs().idxmax()
-
-print(
-    data.loc[
-        i_max,
-        ["time", "dt", "temperature", flux_column, "flux_threshold"],
-    ]
-)

@@ -62,9 +62,9 @@ where $C_{{T_i}0}$ is the fraction of host sites $i$ that can contribute to trap
 
 ### Initial and boundary conditions
 
-The mobile concentration is initially zero. The single Fit A trap population is initially saturated and distributed uniformly from the upstream surface to a depth of 0.7 micrometers. No traps are assigned beyond that depth.
+The mobile concentration is initially zero. To benchmark against TMAP7 fit A in [!cite](Shimada2011), we assume that there is only one trap present in the sample. Further, we assume that this single trap population is initially saturated and distributed uniformly from the upstream surface to a depth of 0.7 micrometers. No additional traps are assigned beyond that depth.
 
-Finite recombination boundary conditions are applied at the upstream and downstream surfaces:
+Recombination boundary conditions are applied capturing the surface reaction rates at the upstream and downstream surfaces:
 
 !equation id=val-2l_recombination
 J = -D\nabla C_M = 2K_r(T)C_M^2,
@@ -136,10 +136,25 @@ The mass-balance residual is computed from the change in retained deuterium plus
     style=width:50%;margin-bottom:2%;margin-left:auto;margin-right:auto
     caption=Deuterium mass-balance residual normalized by the initial deuterium inventory.
 
+### Evolution of mobile and trapped deuterium profiles
+
+[val-2l_profile_animation] shows the evolution of the mobile and trapped
+deuterium concentration profiles during the prescribed TDS temperature
+history. The marker in the upper panel identifies the temperature associated
+with the current time of the simulation. The lower panels show the mobile concentration over
+the full 200 $\mu$m specimen thickness and within 1 $\mu$m of the upstream
+surface, together with the trapped concentration over the first 7 $\mu$m and
+within the first 1 $\mu$m. The dotted vertical line marks the 0.7 $\mu$m
+boundary of the Fit A trap region.
+
+!media figures/val-2l_profile_animation.gif
+    id=val-2l_profile_animation
+    style=width:50%;margin-bottom:2%;margin-left:auto;margin-right:auto
+    caption=Evolution of the mobile and trapped deuterium concentration profiles in the TDS simulation.
+
 ## Discussion and Limitations
 
 This stage of `val-2l` is intentionally limited to the unirradiated Fit A case. It exercises temperature-dependent diffusion, trapping and release, surface recombination rates, a measured temperature history, and inventory accounting in TMAP8. The comparison does not establish that the Fit A trap distribution is unique. In [!cite](Shimada2011), Fit A was calibrated to the TDS spectrum alone and did not reproduce the measured NRA depth profile.
-
 
 ### Planned extension to the neutron-irradiated case
 
@@ -155,7 +170,7 @@ The neutron-irradiated specimen (0.025 dpa) exhibited a much broader desorption 
 
 The files used in the current unirradiated benchmark are:
 
-- [!file](/val-2l.params), which contains the physical and numerical parameters;
-- [!file](/val-2l.i), which defines the one-dimensional transport, trapping, release, surface recombination, and postprocessing model;
+- [/val-2l.params], which contains the physical and numerical parameters;
+- [/val-2l.i], which defines the one-dimensional transport, trapping, release, surface recombination, and postprocessing model;
 
 !bibtex bibliography
