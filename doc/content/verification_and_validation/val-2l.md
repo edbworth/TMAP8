@@ -8,14 +8,14 @@ This validation case is based on the thermal desorption spectroscopy (TDS) exper
 !alert note title=Scope of the current validation
 The present implementation addresses only the unirradiated sample and benchmarks the TMAP8 result against TMAP7 fit A in Figure 3 of [!cite](Shimada2011). It does not yet validate the neutron-irradiated case. A future extension will enhance the model to capture the behavior of the irradiated sample.
 
-For the unirradiated sample, [!cite](Shimada2011) reported a narrow release spectrum between approximately 450 K and 700 K. Their TMAP7 Fit A validated against this spectra assuming a uniform concentration of 4 at.% 1.35 eV traps to a depth of 0.7 $\mu$m.
+For the unirradiated sample, [!cite](Shimada2011) reported a narrow release spectrum between approximately 450 K and 700 K. Their TMAP7 Fit A validated against this spectra assumes a uniform concentration of 4 at.% 1.35 eV traps to a depth of 0.7 $\mu$m.
 
 The objectives of this first stage of `val-2l` are to:
 
 1. Reproduce the unirradiated TMAP7 Fit A model in TMAP8;
 2. Compare the TMAP8 desorption flux with the digitized experimental TDS data;
 3. Verify that the deuterium inventory and integrated surface release satisfy mass conservation;
-4. Establish a model that can later be extended to the neutron-irradiated sample; and
+4. Establish a model that can later be extended to the neutron-irradiated sample.
 
 ## Experimental Description
 
@@ -42,12 +42,12 @@ The physical mobile-species balance is
 !equation id=val-2l_mobile_balance
 \frac{\partial C_M}{\partial t} - \nabla \cdot \left(D(T) \nabla C_M\right) + \sum_{i=1}^{N_{trap}}f_{T/M_i}\frac{\partial C_{T_i}}{\partial t} = 0,
 
-where $C_M$ and $C_{T_i}$ are the concentration of the mobile and trapped species, respectively, $t$ is the time, $D(T)$ is the temperature-dependent diffusivity of deuterium in tungsten, N_{trap} is the number of traps, and $f_{T/M_i}$ is a user-defined numerical scaling factor for better numerical convergence. The deuterium diffusivity follows the Frauenfelder [!citep](frauenfelder1969solution) relation corrected for deuterium and reported by [!cite](Causey2002):
+where $C_M$ and $C_{T_i}$ are the concentration of the mobile and trapped species, respectively, $t$ is the time, $D(T)$ is the temperature-dependent diffusivity of deuterium in tungsten, $N_{trap}$ is the number of traps, and $f_{T/M_i}$ is a user-defined numerical scaling factor for better numerical convergence. The deuterium diffusivity follows the Frauenfelder [!citep](frauenfelder1969solution) relation corrected for deuterium and reported by [!cite](Causey2002):
 
 !equation id=val-2l_diffusivity
 D(T)=D_0\exp\left(-\frac{E_D}{k_B T}\right).
 
-The trapped-species balance is represented by the TMAP8 trapping and release kernels,
+The trapped-species balance is governed by trapping and release:
 
 !equation id=val-2l_trap_balance
 \frac{\partial C_{T_i}}{\partial t} = \alpha_t^i \frac{C_{T_i}^{\text{empty}} C_M}{(N f_{T/M,i})} - \alpha_r^i C_{T_i},
@@ -116,7 +116,7 @@ The concentration variables are rescaled internally by a factor of $f_{T/M}=10^4
 The current comparison script calculates the mean-normalized root-mean-squared-percentage error (RMSPE),
 
 !equation id=val-2l_error_metric
-\mathrm{RMSPE} = \frac{\sqrt{\sum_{i=1}^{n}\left(J_{\mathrm{TMAP8},i}-J_{\mathrm{exp},i}\right)^2/n}}{\sum_{i=1}^{n}J_{\mathrm{exp}}/n}\times100
+\mathrm{RMSPE} = \frac{\sqrt{\sum_{i=1}^{n}\left(J_{\mathrm{TMAP8},i}-J_{\mathrm{exp},i}\right)^2/n}}{\sum_{i=1}^{n}J_{\mathrm{exp}}/n}\times100.
 
 ### Deuterium inventory and mass conservation
 
@@ -149,7 +149,7 @@ boundary of the Fit A trap region.
 
 !media figures/val-2l_profile_animation.gif
     id=val-2l_profile_animation
-    style=width:50%;margin-bottom:2%;margin-left:auto;margin-right:auto
+    style=width:75%;margin-bottom:2%;margin-left:auto;margin-right:auto
     caption=Evolution of the mobile and trapped deuterium concentration profiles in the TDS simulation.
 
 ## Discussion and Limitations
@@ -163,14 +163,14 @@ The neutron-irradiated specimen (0.025 dpa) exhibited a much broader desorption 
 1. add the irradiated experimental TDS and temperature-history data;
 2. introduce multiple trap populations to attempt to capture multiple sharp spectra;
 3. document the irradiation history and the assumptions required, exploring modeling techniques to represent damage to tungsten;
-4. perform mass conservation and validation checks incrementally
-5. optimize material properties for chosen trap distributions and types
+4. perform mass conservation and validation checks incrementally;
+5. optimize material properties for chosen trap distributions and types.
 
 ## Input Files
 
 The files used in the current unirradiated benchmark are:
 
-- [/val-2l.params], which contains the physical and numerical parameters;
-- [/val-2l.i], which defines the one-dimensional transport, trapping, release, surface recombination, and postprocessing model;
+- - [!file](/val-2l.params), which contains the physical and numerical parameters;
+- [!file](/val-2l.i), which defines the one-dimensional transport, trapping, release, surface recombination, and postprocessing model.
 
 !bibtex bibliography
