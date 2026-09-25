@@ -147,7 +147,8 @@ surface, together with the trapped concentration over the first 7 $\mu$m and
 within the first 1 $\mu$m. The dotted vertical line marks the 0.7 $\mu$m
 boundary of the Fit A trap region.
 
-!media figures/val-2l_profile_animation.gif
+!media trapped_profile_animation.py
+    image_name=val-2l_profile_animation.gif
     id=val-2l_profile_animation
     style=width:75%;margin-bottom:2%;margin-left:auto;margin-right:auto
     caption=Evolution of the mobile and trapped deuterium concentration profiles in the TDS simulation.

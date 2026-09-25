@@ -317,7 +317,7 @@
   file_base = 'val-2l_out'
   csv = true
   perf_graph = true
-  sync_times = '100 350'
+  sync_times = '100 350' # Ensure simulation runs at start and end of temperature fluctuation period
   [profile_csv]
     type = CSV
     file_base = 'deuterium_mobile_concentration_profile/val-2l_out'

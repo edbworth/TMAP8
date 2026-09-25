@@ -1,7 +1,6 @@
 """
 This is the main comparison script for val-2l, and computes the following plots:
 
-1: plot_timestep_behavior() visualizes the adaptive timestepper based on critical temperature regions and measured fluxes
 1: plot_temperature_history() shows the temperature profile over the entire time of experiment, as well as an inlet graph that zooms in on temperature anomolies observed during the experiment
 2: plot_mass_conservation() shows the evolution of the mass conservation residual relative to the initial mass at the start of the TDS experiment
 3: plot_inventory() shows the deuterium present in traps and as a mobile concentration
@@ -91,139 +90,7 @@ def annotate_rmspe(simulated, reference, x_pos, y_pos):
         y_pos (float): y-coordinate of the annotation
     """
     RMSPE = compute_rmspe(simulated, reference)
-    plt.text(x_pos, y_pos, "RMSPE = %.2f %%" % RMSPE, fontweight="bold")
-
-
-def plot_timestep_behavior(
-    simulation_file="val-2l_out.csv",
-    filename="val-2l_timestep_behavior.png",
-    temperature_window=(0.0, 350.0),
-):
-    """Plot temperature, desorbed flux, and timestep size over time.
-
-    The shaded regions identify the two timestep-limiting conditions:
-
-    1. The fixed temperature-resolution interval.
-    2. Times when the magnitude of the desorbed flux exceeds the specified
-       threshold.
-
-    Args:
-        simulation_file (str): TMAP8 CSV with "time", "dt", "temperature", and
-            "desorbed_flux" columns.
-        filename (str): Output PNG filename.
-        temperature_window (tuple[float, float]): Start and end times of the fixed
-            fine-timestep interval in seconds.
-    """
-    time, dt, temperature, desorbed_flux, flux_threshold = read_csv_from_TMAP8(
-        simulation_file,
-        ["time", "dt", "temperature", "deuterium_release_flux_total", "flux_threshold"],
-    )
-
-    # Remove a possible initial-output row where TimestepSize has not yet been set.
-    valid = (
-        np.isfinite(time)
-        & np.isfinite(dt)
-        & np.isfinite(temperature)
-        & np.isfinite(desorbed_flux)
-        & (dt > 0.0)
-    )
-    time = time[valid]
-    dt = dt[valid]
-    temperature = temperature[valid]
-    desorbed_flux = desorbed_flux[valid]
-    flux_threshold = flux_threshold[0] * 1e12
-
-    flux_active = np.abs(desorbed_flux) >= flux_threshold
-    temperature_start, temperature_end = temperature_window
-
-    fig, axes = plt.subplots(
-        nrows=3,
-        ncols=1,
-        figsize=(7.0, 8.0),
-        sharex=True,
-    )
-    ax_temperature, ax_flux, ax_dt = axes
-
-    # Temperature history
-    ax_temperature.plot(
-        time,
-        temperature,
-        color="black",
-        linewidth=1.8,
-    )
-    ax_temperature.set_ylabel("Temperature (K)")
-    ax_temperature.set_title("Unirradiated Sample: Timestep-Limiting Regions")
-
-    # Desorbed flux history
-    ax_flux.plot(
-        time,
-        desorbed_flux * 1e12,
-        color="tab:green",
-        linewidth=1.8,
-    )
-    ax_flux.axhline(
-        flux_threshold,
-        color="tab:red",
-        linewidth=1.1,
-        linestyle="--",
-        label=rf"Flux threshold: {flux_threshold:.1e} at/m$^2$/s",
-    )
-    ax_flux.set_ylabel(r"Desorbed flux (at/m$^2$/s)")
-    ax_flux.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
-    ax_flux.legend(loc="best")
-
-    # Actual timestep used over each interval.
-    ax_dt.step(
-        time,
-        dt,
-        where="pre",
-        color="tab:blue",
-        linewidth=1.8,
-    )
-    ax_dt.set_xlabel("Time (s)")
-    ax_dt.set_ylabel("Timestep size (s)")
-
-    # A logarithmic axis makes reductions easier to see when dt spans
-    # multiple orders of magnitude.
-    ax_dt.set_yscale("log")
-
-    # Shade the two timestep-limiting regions on every panel.
-    for index, ax in enumerate(axes):
-        ax.axvspan(
-            temperature_start,
-            temperature_end,
-            color="tab:orange",
-            alpha=0.14,
-            linewidth=0.0,
-            label="Temperature refinement" if index == 0 else None,
-        )
-        ax.fill_between(
-            time,
-            0.0,
-            1.0,
-            where=flux_active,
-            step="pre",
-            transform=ax.get_xaxis_transform(),
-            color="tab:red",
-            alpha=0.09,
-            linewidth=0.0,
-        )
-
-        ax.grid(
-            visible=True,
-            which="major",
-            color="0.65",
-            linestyle="--",
-            alpha=0.3,
-        )
-        ax.minorticks_on()
-
-    ax_temperature.legend(loc="best")
-    ax_dt.set_xlim(0.0, time.max())
-
-    plt.tight_layout()
-    plt.savefig(filename, bbox_inches="tight", dpi=300)
-    plt.close(fig)
+    plt.text(x_pos, y_pos, "RMSPE = %.2f %%" % RMSPE, fontweight="bold", color="blue")
 
 
 def plot_temperature_history(
@@ -394,17 +261,17 @@ def plot_inventory(
 
 def plot_unirradiated_desorption(
     experiment_file="unirradiated_data.csv",
+    benchmark_file="tmap7_fit_a_data.csv",
     simulation_file="val-2l_out.csv",
     simulation_flux_column="deuterium_release_flux_total",
     comparison_plot="val-2l_comparison_desorption.png",
 ):
-    """Plot the Shimada (2010) unirradiated desorption data against TMAP8
-
-    The simulated and experimental desorbed fluxes are plotted versus time,
-    with the RMSPE annotated over the region tmin-tmax seconds.
+    """Plot the Shimada (2010) unirradiated desorption data against TMAP7 and TMAP8.
 
     Args:
-        experiment_file (str): two-column CSV of
+        experiment_file (str): two-column CSV of experimental
+            (time [s], desorbed flux [m^-2 s^-1])
+        benchmark_file (str): two-column CSV of TMAP7 fit A
             (time [s], desorbed flux [m^-2 s^-1])
         simulation_file (str): TMAP8 CSV output holding "time" and
             the desorbed-flux column
@@ -412,8 +279,12 @@ def plot_unirradiated_desorption(
             simulation_file. TMAP8 reports it in at/µm^2/s; converted to at/m^2/s.
         comparison_plot (str): output PNG filename
     """
+
     experiment = np.loadtxt(experiment_file, skiprows=1, delimiter=",")
     experiment_time, experiment_flux = experiment[:, 0], experiment[:, 1]
+
+    benchmark = np.loadtxt(benchmark_file, skiprows=1, delimiter=",")
+    benchmark_time, benchmark_flux = benchmark[:, 0], benchmark[:, 1]
 
     simulation_time, simulation_flux = read_csv_from_TMAP8(
         simulation_file, ["time", simulation_flux_column]
@@ -429,25 +300,38 @@ def plot_unirradiated_desorption(
     mapped_simulation_flux = np.interp(
         experiment_time, simulation_time, simulation_flux
     )
+
     tmin, tmax = 500, 3000
     rmspe_region = (experiment_time >= tmin) & (experiment_time <= tmax)
 
     fig, ax = plt.subplots(figsize=(10, 6))
+
     ax.plot(
-        experiment_time, experiment_flux, "ro", label="Experiment (Shimada 2010, 0 dpa)"
+        experiment_time,
+        experiment_flux,
+        "ko",
+        label="Experiment (Shimada 2010, 0 dpa)",
+    )
+    ax.plot(
+        benchmark_time,
+        benchmark_flux,
+        color="red",
+        linestyle="--",
+        label="TMAP7 fit A",
     )
     ax.plot(simulation_time, simulation_flux, "b-", label="TMAP8")
+
     if rmspe_region.any():
         ax.axvline(
             experiment_time[rmspe_region].min(),
-            color="green",
+            color="black",
             linestyle="--",
             linewidth=1.2,
             label="RMSPE region",
         )
         ax.axvline(
             experiment_time[rmspe_region].max(),
-            color="green",
+            color="black",
             linestyle="--",
             linewidth=1.2,
         )
@@ -457,14 +341,18 @@ def plot_unirradiated_desorption(
             experiment_time.max() / 2,
             experiment_flux.max() / 2,
         )
+
     ax.set_xlabel("Time (s)")
     ax.set_ylabel(r"Desorbed flux (m$^{-2}$s$^{-1}$)")
-    ax.set_title("Unirradiated Sample: Deuterium Desorption: TMAP8 vs Experiment")
+    ax.set_title(
+        "Unirradiated Sample: Deuterium Desorption: " "TMAP8 and TMAP7 vs Experiment"
+    )
     ax.set_xlim(experiment_time.min(), experiment_time.max())
     ax.set_ylim(bottom=0)
     ax.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
     ax.legend()
     ax.grid(True)
+
     plt.tight_layout()
     plt.savefig(comparison_plot, bbox_inches="tight", dpi=300)
     plt.close(fig)
@@ -472,13 +360,17 @@ def plot_unirradiated_desorption(
 
 # ========================== Plot calls ========================== #
 
-plot_timestep_behavior()
 plot_temperature_history()
 plot_mass_conservation()
 plot_inventory()
 
 if "/tmap8/doc/" in script_folder.lower():  # if in documentation folder
     unirradiated_data_file = "../../../../test/tests/val-2l/gold/unirradiated_data.csv"
+    benchmark_data_file = "../../../../test/tests/val-2l/gold/tmap7_fit_a_data.csv"
 else:  # if in test folder
     unirradiated_data_file = "./gold/unirradiated_data.csv"
-plot_unirradiated_desorption(experiment_file=unirradiated_data_file)
+    benchmark_data_file = "./gold/tmap7_fit_a_data.csv"
+
+plot_unirradiated_desorption(
+    experiment_file=unirradiated_data_file, benchmark_file=benchmark_data_file
+)
