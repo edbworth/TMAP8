@@ -21,17 +21,19 @@ import pandas as pd
 
 # File paths
 SCRIPT_DIR = Path(__file__).resolve().parent
-MOBILE_DIR = SCRIPT_DIR / "deuterium_mobile_concentration_profile"
-TRAPPED_DIR = SCRIPT_DIR / "deuterium_trapped_concentration_profile"
+GOLD_DIR = SCRIPT_DIR / "gold"
+MOBILE_DIR = GOLD_DIR / "deuterium_mobile_concentration_profile"
+TRAPPED_DIR = GOLD_DIR / "deuterium_trapped_concentration_profile"
 MOBILE_COL = "mobile"
 TRAPPED_COL = "trapped_1"
-MAIN_CSV = SCRIPT_DIR / "val-2l_out.csv"
+MAIN_CSV = GOLD_DIR / "val-2l_out.csv"
 OUTPUT_FILE = SCRIPT_DIR / "val-2l_profile_animation.gif"
 
 # Animation settings
-FRAME_STRIDE = 1
-FPS = 8
-OUTPUT_DPI = 100
+FRAME_STRIDE = 10
+FPS = 4
+OUTPUT_DPI = 80
+MAX_TIME = 3500.0
 FIGURE_SIZE = (9, 6.75)
 
 # Panel definitions
@@ -45,7 +47,7 @@ PANELS = [
 
 COLOR_MOBILE = "steelblue"
 COLOR_TRAPPED = "darkorange"
-COLOR_TRAP_BOUNDARY = "dimgray"
+COLOR_TRAP_BOUNDARY = "black"
 
 
 # Helpers
@@ -70,13 +72,17 @@ def profile_number(path):
     return int(path.stem.rsplit("_", maxsplit=1)[-1])
 
 
-def load_profile_series(directory, col_hint, scale=1.0):
+def find_profile_files(directory):
     files = sorted(directory.glob("val-2l_out_*.csv"), key=profile_number)
     if not files:
         raise FileNotFoundError(
             f"No profile CSVs found in '{directory}'.\n"
             "Check that the VectorPostprocessor output block is active in val-2l.i."
         )
+    return files
+
+
+def load_profile_series(files, col_hint, scale=1.0):
     xs, cs = [], []
     col_name = None
     for f in files:
@@ -86,6 +92,66 @@ def load_profile_series(directory, col_hint, scale=1.0):
         xs.append(df["x"].values)
         cs.append(df[col_name].values * scale)
     return xs, cs
+
+
+def select_profile_inputs(all_times, frame_stride, max_time):
+    """Return completed-timestep profiles and matching scalar-output rows."""
+    mobile_files = find_profile_files(MOBILE_DIR)
+    trapped_files = find_profile_files(TRAPPED_DIR)
+
+    mobile_numbers = [profile_number(path) for path in mobile_files]
+    trapped_numbers = [profile_number(path) for path in trapped_files]
+    if mobile_numbers != trapped_numbers:
+        raise ValueError(
+            "The mobile and trapped profile directories must contain matching "
+            "output numbers."
+        )
+
+    invalid_numbers = [
+        number for number in mobile_numbers if number < 0 or number >= len(all_times)
+    ]
+    if invalid_numbers:
+        raise ValueError(
+            "Profile output numbers do not map to rows in "
+            f"'{MAIN_CSV}': {invalid_numbers}."
+        )
+
+    # Profile 0000 is the initial state. Completed timesteps begin at 0001,
+    # which maps directly to row 1 of the scalar-output arrays.
+    available = np.array([number for number in mobile_numbers if number > 0])
+    if max_time is not None:
+        available = available[all_times[available] <= max_time]
+    if not available.size:
+        raise ValueError("No profile frames satisfy the requested maximum time.")
+
+    complete_series = np.array_equal(available, np.arange(1, available[-1] + 1))
+    if complete_series:
+        selected = available[::frame_stride]
+        # Always include the last available state at or before max_time.
+        if selected[-1] != available[-1]:
+            selected = np.append(selected, available[-1])
+    else:
+        # A sparse gold directory already contains the selected animation frames.
+        # Use each available profile instead of applying the stride a second time.
+        selected = available
+
+    mobile_by_number = dict(zip(mobile_numbers, mobile_files))
+    trapped_by_number = dict(zip(trapped_numbers, trapped_files))
+    return (
+        [mobile_by_number[number] for number in selected],
+        [trapped_by_number[number] for number in selected],
+        selected,
+        len(all_times) - 1,
+    )
+
+
+def relative_input_paths(mobile_files, trapped_files):
+    """Return paths suitable for the TestHarness csvdiff parameter."""
+    return [
+        MAIN_CSV.name,
+        *(str(path.relative_to(GOLD_DIR)) for path in mobile_files),
+        *(str(path.relative_to(GOLD_DIR)) for path in trapped_files),
+    ]
 
 
 def global_ylim(c_series, x_series, x_min, x_max, pad=0.08):
@@ -106,7 +172,9 @@ def build_animation(
     frame_stride=FRAME_STRIDE,
     fps=FPS,
     dpi=OUTPUT_DPI,
+    max_time=MAX_TIME,
     output_file=OUTPUT_FILE,
+    list_selected_files=False,
 ):
     if frame_stride < 1:
         raise ValueError("frame_stride must be at least 1.")
@@ -114,6 +182,8 @@ def build_animation(
         raise ValueError("fps must be positive.")
     if dpi <= 0:
         raise ValueError("dpi must be positive.")
+    if max_time is not None and max_time < 0:
+        raise ValueError("max_time must be nonnegative.")
 
     # Scalar CSV for time and temperature
     main_df = pd.read_csv(MAIN_CSV)
@@ -130,34 +200,31 @@ def build_animation(
     trap_per_free = main_df["trap_per_free"].iloc[0]
     trap_boundary = main_df["trap_depth"].iloc[0]
 
-    # Load profile series
-    mob_xs, mob_cs = load_profile_series(MOBILE_DIR, MOBILE_COL, scale=1.0)
-    trp_xs, trp_cs = load_profile_series(TRAPPED_DIR, TRAPPED_COL, scale=trap_per_free)
-    if len(mob_xs) != len(trp_xs):
-        raise ValueError(
-            "The mobile and trapped profile directories contain different numbers "
-            f"of files ({len(mob_xs)} and {len(trp_xs)}, respectively)."
-        )
+    mobile_files, trapped_files, scalar_rows, total_profiles = select_profile_inputs(
+        all_times, frame_stride, max_time
+    )
+    if list_selected_files:
+        print(" ".join(relative_input_paths(mobile_files, trapped_files)))
+        return
 
+    # Read only the profiles that will become GIF frames.
+    mob_xs, mob_cs = load_profile_series(mobile_files, MOBILE_COL, scale=1.0)
+    trp_xs, trp_cs = load_profile_series(
+        trapped_files, TRAPPED_COL, scale=trap_per_free
+    )
+    selected_times = all_times[scalar_rows]
+    selected_temps = all_temps[scalar_rows]
     n_frames = len(mob_xs)
-    if n_frames == len(all_times):
-        # The profile output includes the initial state at t = 0.
-        time_offset = 0
-    elif all_times[0] == 0.0 and n_frames == len(all_times) - 1:
-        # The scalar CSV includes t = 0, but profiles begin at the first timestep end.
-        time_offset = 1
-    else:
-        raise ValueError(
-            f"'{MAIN_CSV}' contains {len(all_times)} time rows, while the profile "
-            f"directories contain {n_frames} frames. Expected either one profile "
-            "per CSV row or one fewer profile when the CSV includes an initial row."
-        )
+    time_limit = "none" if max_time is None else f"{max_time:g} s"
+    print(
+        f"Using {n_frames} of {total_profiles} completed-timestep profile frames "
+        f"(stride={frame_stride}, max_time={time_limit})."
+    )
 
     def frame_metadata(i):
-        row = i + time_offset
-        return all_times[row], all_temps[row]
+        return selected_times[i], selected_temps[i]
 
-    frame_indices = range(0, n_frames, frame_stride)
+    frame_indices = range(n_frames)
 
     series = {
         "mobile": (mob_xs, mob_cs, COLOR_MOBILE),
@@ -174,23 +241,33 @@ def build_animation(
     axes = gs.subplots()
 
     # Temperature ramp axes
-    temp_ax.plot(all_times, all_temps, color="firebrick", linewidth=1.5)
+    temperature_mask = np.ones(len(all_times), dtype=bool)
+    if max_time is not None:
+        temperature_mask = all_times <= max_time
+    plotted_times = all_times[temperature_mask]
+    plotted_temps = all_temps[temperature_mask]
+    temp_ax.plot(plotted_times, plotted_temps, color="firebrick", linewidth=1.5)
     (temp_marker,) = temp_ax.plot(
-        all_times[0], all_temps[0], "o", color="firebrick", markersize=6, zorder=5
+        selected_times[0],
+        selected_temps[0],
+        "o",
+        color="firebrick",
+        markersize=6,
+        zorder=5,
     )
-    temp_ax.set_xlim(0, all_times[-1])
-    temp_ax.set_ylim(all_temps.min() * 0.95, all_temps.max() * 1.05)
+    temp_ax.set_xlim(plotted_times[0], plotted_times[-1])
+    temp_ax.set_ylim(plotted_temps.min() * 0.95, plotted_temps.max() * 1.05)
     temp_ax.set_xlabel("Time (s)", fontsize=8)
     temp_ax.set_ylabel("T (K)", fontsize=8)
     temp_ax.tick_params(labelsize=7)
     temp_ax.grid(True, linestyle="--", alpha=0.35)
     state_text = temp_ax.text(
         0.99,
-        0.90,
+        0.08,
         "",
         transform=temp_ax.transAxes,
         ha="right",
-        va="top",
+        va="bottom",
         fontsize=8,
     )
 
@@ -222,7 +299,8 @@ def build_animation(
                 linewidth=1.1,
                 label=f"Trap edge ({trap_boundary} µm)",
             )
-            ax.legend(fontsize=7, loc="upper right")
+            legend_location = "upper left" if xhi == 1.0 else "upper right"
+            ax.legend(fontsize=7, loc=legend_location)
 
     # Animation update
     def update(frame):
@@ -286,6 +364,17 @@ if __name__ == "__main__":
         help="Set the saved GIF resolution in dots per inch (default: %(default)s).",
     )
     parser.add_argument(
+        "--max-time",
+        type=float,
+        default=MAX_TIME,
+        help="Ignore profiles after this time in seconds (default: %(default)s).",
+    )
+    parser.add_argument(
+        "--list-selected-files",
+        action="store_true",
+        help="Print the files used by the animation and exit without creating a GIF.",
+    )
+    parser.add_argument(
         "--output",
         type=Path,
         default=OUTPUT_FILE,
@@ -297,5 +386,7 @@ if __name__ == "__main__":
         frame_stride=args.frame_stride,
         fps=args.fps,
         dpi=args.dpi,
+        max_time=args.max_time,
         output_file=args.output,
+        list_selected_files=args.list_selected_files,
     )

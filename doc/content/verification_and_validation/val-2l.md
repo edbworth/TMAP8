@@ -147,7 +147,7 @@ surface, together with the trapped concentration over the first 7 $\mu$m and
 within the first 1 $\mu$m. The dotted vertical line marks the 0.7 $\mu$m
 boundary of the Fit A trap region.
 
-!media trapped_profile_animation.py
+!media trapped_profile_animation_val-2l.py
     image_name=val-2l_profile_animation.gif
     id=val-2l_profile_animation
     style=width:75%;margin-bottom:2%;margin-left:auto;margin-right:auto
@@ -171,7 +171,7 @@ The neutron-irradiated specimen (0.025 dpa) exhibited a much broader desorption 
 
 The files used in the current unirradiated benchmark are:
 
-- - [!file](/val-2l.params), which contains the physical and numerical parameters;
+- [!file](/val-2l.params), which contains the physical and numerical parameters;
 - [!file](/val-2l.i), which defines the one-dimensional transport, trapping, release, surface recombination, and postprocessing model.
 
 !bibtex bibliography
