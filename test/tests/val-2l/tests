@@ -2,9 +2,20 @@
   design = 'val-2l.md MatNeumannBC.md TrappingNodalKernel.md ReleasingNodalKernel.md'
   issues = '#405'
   validation = 'val-2l.md'
+  [val-2l_csvdiff]
+    type = CSVDiff
+    input = 'val-2l.i'
+    csvdiff = 'val-2l_out.csv'
+    override_columns = 'deuterium_mass_conservation_residual'
+    override_abs_zero = '1e-1'
+    override_rel_err = '2e-5'
+    requirement = 'The system shall be able to model deuterium transport through irradiated tungsten for comparison with experimental results.'
+  []
   [val-2l_animation_csvdiff]
     type = CSVDiff
     input = 'val-2l.i'
+    prereq = val-2l_csvdiff
+    should_execute = False
     csvdiff = 'deuterium_mobile_concentration_profile/val-2l_out_mobile_profile_0001.csv
                deuterium_mobile_concentration_profile/val-2l_out_mobile_profile_0011.csv
                deuterium_mobile_concentration_profile/val-2l_out_mobile_profile_0021.csv
@@ -37,16 +48,7 @@
                deuterium_trapped_concentration_profile/val-2l_out_trapped_1_profile_0131.csv
                deuterium_trapped_concentration_profile/val-2l_out_trapped_1_profile_0141.csv
                deuterium_trapped_concentration_profile/val-2l_out_trapped_1_profile_0149.csv'
-    requirement = 'The system shall be able to model deuterium transport through irradiated tungsten for comparison with experimental results.'
-  []
-  [val-2l_csvdiff]
-    type = CSVDiff
-    input = 'val-2l.i'
-    csvdiff = 'val-2l_out.csv'
-    override_columns = 'deuterium_mass_conservation_residual'
-    override_abs_zero = '1e-1'
-    override_rel_err = '2e-5'
-    requirement = 'The system shall be able to model deuterium transport through irradiated tungsten for comparison with experimental results.'
+    requirement = 'The system shall be able to model deuterium transport through irradiated tungsten for comparison with experimental results and generate the concentration profiles.'
   []
   [val-2l_comparison]
     type = RunCommand

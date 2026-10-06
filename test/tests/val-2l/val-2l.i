@@ -278,7 +278,7 @@
     use_t = true
     execute_on = 'TIMESTEP_END'
     outputs = csv
-[]
+  []
 
   [deuterium_released_physical]
     type = TimeIntegratedPostprocessor

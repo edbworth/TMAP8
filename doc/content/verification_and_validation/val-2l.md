@@ -59,10 +59,11 @@ where the terms in the right-hand side represent trapping and release, respectiv
 \end{equation}
 
 where $C_{{T_i}0}$ is the fraction of host sites $i$ that can contribute to trapping.
+Note that in this model, TMAP8 accounts for a single trapping population, which is consistent with the TMAP7 fit A model in [!cite](Shimada2011), so $N_{trap}=1$.
 
 ### Initial and boundary conditions
 
-The mobile concentration is initially zero. To benchmark against TMAP7 fit A in [!cite](Shimada2011), we assume that there is only one trap present in the sample. Further, we assume that this single trap population is initially saturated and distributed uniformly from the upstream surface to a depth of 0.7 micrometers. No additional traps are assigned beyond that depth.
+The mobile concentration is initially zero. Further, we assume that the single trap population is initially saturated and distributed uniformly from the upstream surface to a depth of 0.7 micrometers. No additional traps are assigned beyond that depth.
 
 Recombination boundary conditions are applied capturing the surface reaction rates at the upstream and downstream surfaces:
 
