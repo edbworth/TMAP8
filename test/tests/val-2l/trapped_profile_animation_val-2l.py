@@ -11,25 +11,31 @@ A temperature-ramp axes sits above the panels; a marker tracks the current frame
 This script is modular, so add and remove panels as traps are changed and added.
 """
 
-import argparse
-from pathlib import Path
-
 import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import os
+from pathlib import Path
+
+# Changes working directory to script directory (for consistent MooseDocs usage)
+script_folder = os.path.dirname(os.path.abspath(__file__))
+os.chdir(script_folder)
 
 # File paths
-SCRIPT_DIR = Path(__file__).resolve().parent
-GOLD_DIR = SCRIPT_DIR / "gold"
-MOBILE_DIR = GOLD_DIR / "deuterium_mobile_concentration_profile"
-TRAPPED_DIR = GOLD_DIR / "deuterium_trapped_concentration_profile"
-MOBILE_COL = "mobile"
-TRAPPED_COL = "trapped_1"
-MAIN_CSV = GOLD_DIR / "val-2l_out.csv"
-OUTPUT_FILE = SCRIPT_DIR / "val-2l_profile_animation.gif"
+if "/tmap8/doc/" in script_folder.lower():  # if in documentation folder
+    gold_dir = "../../../../test/tests/val-2l/gold"
+else:  # if in test folder
+    gold_dir = "./gold"
+
+mobile_dir = f"{gold_dir}/deuterium_mobile_concentration_profile"
+trapped_dir = f"{gold_dir}/deuterium_trapped_concentration_profile"
+main_csv = f"{gold_dir}/val-2l_out.csv"
 
 # Animation settings
+MOBILE_COL = "mobile"
+TRAPPED_COL = "trapped_1"
+OUTPUT_FILE = "val-2l_profile_animation.gif"
 FRAME_STRIDE = 10
 FPS = 4
 OUTPUT_DPI = 80
@@ -96,8 +102,8 @@ def load_profile_series(files, col_hint, scale=1.0):
 
 def select_profile_inputs(all_times, frame_stride, max_time):
     """Return completed-timestep profiles and matching scalar-output rows."""
-    mobile_files = find_profile_files(MOBILE_DIR)
-    trapped_files = find_profile_files(TRAPPED_DIR)
+    mobile_files = find_profile_files(Path(mobile_dir))
+    trapped_files = find_profile_files(Path(trapped_dir))
 
     mobile_numbers = [profile_number(path) for path in mobile_files]
     trapped_numbers = [profile_number(path) for path in trapped_files]
@@ -113,7 +119,7 @@ def select_profile_inputs(all_times, frame_stride, max_time):
     if invalid_numbers:
         raise ValueError(
             "Profile output numbers do not map to rows in "
-            f"'{MAIN_CSV}': {invalid_numbers}."
+            f"'{main_csv}': {invalid_numbers}."
         )
 
     # Profile 0000 is the initial state. Completed timesteps begin at 0001,
@@ -147,10 +153,12 @@ def select_profile_inputs(all_times, frame_stride, max_time):
 
 def relative_input_paths(mobile_files, trapped_files):
     """Return paths suitable for the TestHarness csvdiff parameter."""
+    gold_path = Path(gold_dir)
+    main_csv_name = os.path.basename(main_csv)
     return [
-        MAIN_CSV.name,
-        *(str(path.relative_to(GOLD_DIR)) for path in mobile_files),
-        *(str(path.relative_to(GOLD_DIR)) for path in trapped_files),
+        main_csv_name,
+        *(str(path.relative_to(gold_path)) for path in mobile_files),
+        *(str(path.relative_to(gold_path)) for path in trapped_files),
     ]
 
 
@@ -186,12 +194,12 @@ def build_animation(
         raise ValueError("max_time must be nonnegative.")
 
     # Scalar CSV for time and temperature
-    main_df = pd.read_csv(MAIN_CSV)
+    main_df = pd.read_csv(main_csv)
     required_columns = {"time", "temperature", "trap_per_free", "trap_depth"}
     missing_columns = required_columns.difference(main_df.columns)
     if missing_columns:
         raise KeyError(
-            f"Missing required columns in '{MAIN_CSV}': "
+            f"Missing required columns in '{main_csv}': "
             f"{', '.join(sorted(missing_columns))}"
         )
 
@@ -326,67 +334,13 @@ def build_animation(
     if show:
         plt.show()
     else:
-        output_path = Path(output_file)
-        if not output_path.is_absolute():
-            output_path = SCRIPT_DIR / output_path
-        print(f"Saving animation to {output_path} …")
-        ani.save(output_path, writer="pillow", fps=fps, dpi=dpi)
+        print(f"Saving animation to {output_file} …")
+        ani.save(output_file, writer="pillow", fps=fps, dpi=dpi)
         print("Done.")
 
     plt.close(fig)
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Animate mobile and trapped D profiles from val-2l TMAP8 output."
-    )
-    parser.add_argument(
-        "--show",
-        action="store_true",
-        help="Preview interactively instead of saving to file.",
-    )
-    parser.add_argument(
-        "--frame-stride",
-        type=int,
-        default=FRAME_STRIDE,
-        help="Include every Nth profile in the animation (default: %(default)s).",
-    )
-    parser.add_argument(
-        "--fps",
-        type=float,
-        default=FPS,
-        help="Set the saved or interactive playback rate (default: %(default)s).",
-    )
-    parser.add_argument(
-        "--dpi",
-        type=int,
-        default=OUTPUT_DPI,
-        help="Set the saved GIF resolution in dots per inch (default: %(default)s).",
-    )
-    parser.add_argument(
-        "--max-time",
-        type=float,
-        default=MAX_TIME,
-        help="Ignore profiles after this time in seconds (default: %(default)s).",
-    )
-    parser.add_argument(
-        "--list-selected-files",
-        action="store_true",
-        help="Print the files used by the animation and exit without creating a GIF.",
-    )
-    parser.add_argument(
-        "--output",
-        type=Path,
-        default=OUTPUT_FILE,
-        help="Set the output GIF path (default: %(default)s).",
-    )
-    args = parser.parse_args()
-    build_animation(
-        show=args.show,
-        frame_stride=args.frame_stride,
-        fps=args.fps,
-        dpi=args.dpi,
-        max_time=args.max_time,
-        output_file=args.output,
-        list_selected_files=args.list_selected_files,
-    )
+# ========================== Animation call ========================== #
+
+build_animation()
