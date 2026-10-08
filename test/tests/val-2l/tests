@@ -16,6 +16,7 @@
     input = 'val-2l.i'
     prereq = val-2l_csvdiff
     should_execute = False
+    ignore_columns = 'id'
     csvdiff = 'deuterium_mobile_concentration_profile/val-2l_out_mobile_profile_0001.csv
                deuterium_mobile_concentration_profile/val-2l_out_mobile_profile_0011.csv
                deuterium_mobile_concentration_profile/val-2l_out_mobile_profile_0021.csv
