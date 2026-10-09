@@ -36,8 +36,8 @@ def read_csv_from_TMAP8(file_name, parameter_names):
     if "/tmap8/doc/" in script_folder.lower():  # if in documentation folder
         csv_folder = f"../../../../test/tests/val-2l/gold/{file_name}"
     else:  # if in test folder
-        csv_folder = f"./{file_name}"
-        # csv_folder = f"./gold/{file_name}"
+        # csv_folder = f"./{file_name}"
+        csv_folder = f"./gold/{file_name}"
 
     simulation_data = pd.read_csv(csv_folder)
     return np.array([simulation_data[name] for name in parameter_names])
@@ -301,8 +301,11 @@ def plot_unirradiated_desorption(
         experiment_time, simulation_time, simulation_flux
     )
 
-    tmin, tmax = 500, 3000
+    tmin, tmax = 900, 2600
     rmspe_region = (experiment_time >= tmin) & (experiment_time <= tmax)
+
+    # Interpolate TMAP7 fit A at experimental time points for RMSPE
+    mapped_benchmark_flux = np.interp(experiment_time, benchmark_time, benchmark_flux)
 
     fig, ax = plt.subplots(figsize=(10, 6))
 
@@ -322,24 +325,36 @@ def plot_unirradiated_desorption(
     ax.plot(simulation_time, simulation_flux, "b-", label="TMAP8")
 
     if rmspe_region.any():
-        ax.axvline(
-            experiment_time[rmspe_region].min(),
-            color="black",
-            linestyle="--",
-            linewidth=1.2,
-            label="RMSPE region",
+        # Calculate both RMSPE values
+        rmspe_tmap8 = compute_rmspe(
+            mapped_simulation_flux[rmspe_region], experiment_flux[rmspe_region]
         )
-        ax.axvline(
-            experiment_time[rmspe_region].max(),
-            color="black",
-            linestyle="--",
-            linewidth=1.2,
+        rmspe_tmap7 = compute_rmspe(
+            mapped_benchmark_flux[rmspe_region], experiment_flux[rmspe_region]
         )
-        annotate_rmspe(
-            mapped_simulation_flux[rmspe_region],
-            experiment_flux[rmspe_region],
-            experiment_time.max() / 2,
-            experiment_flux.max() / 2,
+
+        # Add color-coded RMSPE annotations to left center
+        ax.text(
+            0.02,
+            0.55,
+            f"TMAP8 RMSPE = {rmspe_tmap8:.2f}%",
+            transform=ax.transAxes,
+            fontweight="bold",
+            color="blue",
+            verticalalignment="center",
+            horizontalalignment="left",
+            fontsize=11,
+        )
+        ax.text(
+            0.02,
+            0.47,
+            f"TMAP7 fit A RMSPE = {rmspe_tmap7:.2f}%",
+            transform=ax.transAxes,
+            fontweight="bold",
+            color="red",
+            verticalalignment="center",
+            horizontalalignment="left",
+            fontsize=11,
         )
 
     ax.set_xlabel("Time (s)")
@@ -347,7 +362,7 @@ def plot_unirradiated_desorption(
     ax.set_title(
         "Unirradiated Sample: Deuterium Desorption: " "TMAP8 and TMAP7 vs Experiment"
     )
-    ax.set_xlim(experiment_time.min(), experiment_time.max())
+    ax.set_xlim(tmin, tmax)
     ax.set_ylim(bottom=0)
     ax.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
     ax.legend()

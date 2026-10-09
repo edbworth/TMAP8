@@ -35,7 +35,7 @@ trap_per_free = 1e4 # User specified
 
 # Detrapping Parameters
 alpha_r_0 = '${units 8.4e12 1/s}' # Ambrosek and Longhurst 2008 (val-2d)
-detrapping_energy = '${units ${fparse 1.35 / kb_eV} K}' # TMAP7 fit A Shimida et al. 2010
+detrapping_energy = '${units ${fparse 1.30 / kb_eV} K}' # TMAP7 fit A Shimida et al. 2010
 
 # Mesh Parameters (Ensure that all trap endpoints have a node)
 depth_A  = '${units 0.7 mum}'   # TMAP7 fit A trap boundary
