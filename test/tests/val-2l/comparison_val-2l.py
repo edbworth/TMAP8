@@ -36,7 +36,6 @@ def read_csv_from_TMAP8(file_name, parameter_names):
     if "/tmap8/doc/" in script_folder.lower():  # if in documentation folder
         csv_folder = f"../../../../test/tests/val-2l/gold/{file_name}"
     else:  # if in test folder
-        # csv_folder = f"./{file_name}"
         csv_folder = f"./gold/{file_name}"
 
     simulation_data = pd.read_csv(csv_folder)

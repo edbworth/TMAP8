@@ -97,7 +97,7 @@
 
 
 [BCs]
-  active = 'left right'
+  active = 'left_recombination_flux right_recombination_flux'
 
   [left]
     type = ADDirichletBC
